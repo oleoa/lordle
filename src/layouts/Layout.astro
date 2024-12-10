@@ -7,7 +7,12 @@
         <meta name="generator" content={Astro.generator} />
         <title>Wordly</title>
     </head>
-    <body class="bg-cyan-950 text-white">
+    <body class="text-white bg">
         <slot />
+        <style is:global>
+            .bg {
+                background-color: rgba(50, 50, 44);
+            }
+        </style>
     </body>
 </html>

@@ -1,7 +1,8 @@
 export default function LetterSquare(props) {
   let color;
-  if (props.color == "green") color = "rgba(0, 255, 0, 0.5)";
-  if (props.color == "yellow") color = "rgba(255, 255, 0, 0.5)";
+  if (props.color == "gray") color = "rgba(125, 132, 145)";
+  if (props.color == "green") color = "rgba(77, 170, 87)";
+  if (props.color == "yellow") color = "rgba(255, 200, 87)";
   return (
     <div
       id={props.chance}

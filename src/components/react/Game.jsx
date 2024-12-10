@@ -41,8 +41,17 @@ export default function Game(props) {
     if (!avaiableKeys.includes(props.click)) return;
 
     if (props.click == "Enter") {
+      // Get the written word in an array
       const writtenWord = keys[currentRow];
+
+      // If the written word is shorter than the whole length returns
       if (writtenWord.length < props.letters) return;
+
+      // Checks if the word is a word
+      if (!props.avaiableWords.includes(writtenWord.join(""))) return;
+
+      // Checks if there is any compatibility and colors it
+      // TO FIX THE DUPLICATE CASE LETTER
       let chosenWordArray = chosenWord.split("");
       let newColor = colors.map((rowArr) => [...rowArr]);
       for (let i = 0; i < writtenWord.length; i++) {
@@ -50,27 +59,39 @@ export default function Game(props) {
           newColor[currentRow][i] = "green";
         } else if (chosenWordArray.includes(writtenWord[i])) {
           newColor[currentRow][i] = "yellow";
+        } else {
+          newColor[currentRow][i] = "gray";
         }
       }
-
       setColors(newColor);
 
+      // Checks if the written word is equal to the chosen one
       if (
         writtenWord.every((value, index) => value === chosenWordArray[index])
       ) {
         props.setGameStatus("won");
+        return;
       } else {
+        // If it is not it checks if the user lost
+        if (currentRow >= rows - 1) {
+          props.setGameStatus("lost");
+          return;
+        }
+
+        // If the player didn't lose it passes to the next line
         setCurrentRow((prevRow) => prevRow + 1);
         setCurrentLetter(0);
+        return;
       }
-      return;
     }
 
+    // Takes the player back to the menu
     if (props.click == "Escape") {
       props.setGameStatus("menu");
       return;
     }
 
+    // Deletes one character
     if (props.click == "Backspace") {
       if (currentLetter == 0) return;
       unsetKey(currentRow, currentLetter - 1);
@@ -78,6 +99,7 @@ export default function Game(props) {
       return;
     }
 
+    // Add a new letter
     if (alphabet.includes(props.click)) {
       if (currentLetter > props.letters - 1) return;
       const pressedKey = props.click.toUpperCase();
