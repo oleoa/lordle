@@ -66,7 +66,10 @@ export default function Game(props) {
       return;
     }
 
-    if (props.gameStatus == "won") return;
+    if (props.click == "Escape") {
+      props.setGameStatus("menu");
+      return;
+    }
 
     if (props.click == "Backspace") {
       if (currentLetter == 0) return;

@@ -90,7 +90,7 @@ export default function Env() {
   return (
     <div className="flex flex-col items-center justify-center gap-4">
       {gameStatus == "menu" && (
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-start justify-center gap-4">
           <h1 className="text-5xl font-bold">Menu</h1>
           <div className="grid grid-cols-2 gap-4 justify-items-center">
             <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4">
@@ -106,7 +106,7 @@ export default function Env() {
               <span className="rounded-lg px-4 py-2 bg-blue-500">More (L)</span>
             </div>
           </div>
-          <span className="bg-green-500 rounded-lg px-4 py-2 w-full text-center">
+          <span className="bg-green-500 rounded-lg px-4 py-2 text-center">
             Start (Enter)
           </span>
         </div>
@@ -123,13 +123,22 @@ export default function Env() {
           click={click}
         />
       )}
+      {gameStatus == "ready" && (
+        <div className="flex flex-col items-start justify-center gap-4 w-full">
+          <span className="rounded-lg bg-red-500 py-2 px-4">
+            Leave (Escape)
+          </span>
+        </div>
+      )}
       {gameStatus == "won" && (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col items-start justify-center gap-4 w-full">
           <h1 className="text-5xl font-bold">You Won!</h1>
-          <button className="rounded-lg bg-green-500 py-2">
+          <span className="rounded-lg bg-green-500 py-2 px-4">
             Play Again (Enter)
+          </span>
+          <button className="rounded-lg bg-blue-500 py-2 px-4">
+            Menu (Escape)
           </button>
-          <button className="rounded-lg bg-blue-500 py-2">Menu (Escape)</button>
         </div>
       )}
     </div>
