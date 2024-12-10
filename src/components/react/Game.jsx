@@ -3,24 +3,18 @@ import LetterSquare from "./LetterSquare";
 import alphabet from "../../assets/alphabet.json";
 
 export default function Game(props) {
-  const chosenWord = "MAYBE";
-
+  // Indicates the rules the game will be played with
+  const chosenWord = props.chosenWord;
   const rows = props.rows;
   const letters = props.letters;
 
-  let lettersSquares = [];
-  let keysArray = [];
-  let colorsArray = [];
-  for (let i = 0; i < rows; i++) {
-    keysArray[i] = [];
-    colorsArray[i] = [];
-    for (let n = 0; n < letters; n++) {
-      keysArray[i][n];
-      colorsArray[i][n];
-    }
-  }
+  // Indicates where the user is typing
+  const [currentRow, setCurrentRow] = useState(0);
+  const [currentLetter, setCurrentLetter] = useState(0);
 
-  const [keys, setKeys] = useState(keysArray);
+  // Creates the spaces for the letters and colors to be filled
+  const [colors, setColors] = useState(Array(rows).fill([]));
+  const [keys, setKeys] = useState(Array(rows).fill([]));
   const setKey = (row, letter, value) => {
     let newKeys = keys.map((rowArr) => [...rowArr]);
     newKeys[row][letter] = value;
@@ -32,33 +26,20 @@ export default function Game(props) {
     setKeys(newKeys);
   };
 
-  const [colors, setColors] = useState(colorsArray);
-
-  for (let i = 0; i < rows; i++) {
-    lettersSquares[i] = [];
-    for (let n = 0; n < letters; n++) {
-      lettersSquares[i][n] = (
-        <LetterSquare
-          letter={keys[i][n]}
-          color={colors[i][n]}
-          key={i + "" + n}
-        />
-      );
-    }
-  }
-
-  const [currentRow, setCurrentRow] = useState(0);
-  const [currentLetter, setCurrentLetter] = useState(0);
-
-  // ---------- Checks if the user clicked ----------
+  // Check if the game has restarted
   useEffect(() => {
-    // ---------- Checks if the click is part of the allowed clicks ----------
-    const avaiableKeys = alphabet;
-    avaiableKeys.push(...["Enter", "Backspace"]);
-    if (!avaiableKeys.includes(props.click)) return;
-    // ---------- Checks if the click is part of the allowed clicks ----------
+    setKeys(Array(rows).fill([]));
+    setColors(Array(rows).fill([]));
+    setCurrentRow(0);
+    setCurrentLetter(0);
+  }, [props.round]);
 
-    // ---------- If the user clicked "Enter" ----------
+  // Tracks the users keyboard while in game
+  useEffect(() => {
+    const avaiableKeys = alphabet;
+    avaiableKeys.push(...["Enter", "Backspace", "Escape"]);
+    if (!avaiableKeys.includes(props.click)) return;
+
     if (props.click == "Enter") {
       const writtenWord = keys[currentRow];
       if (writtenWord.length < props.letters) return;
@@ -84,7 +65,6 @@ export default function Game(props) {
       }
       return;
     }
-    // ---------- If the user clicked "Enter" ----------
 
     if (props.gameStatus == "won") return;
 
@@ -102,7 +82,21 @@ export default function Game(props) {
       setCurrentLetter((prevLetter) => prevLetter + 1);
     }
   }, [props.clickId]);
-  // ---------- Checks if the user clicked ----------
+
+  // Creates the components
+  let lettersSquares = [];
+  for (let i = 0; i < rows; i++) {
+    lettersSquares[i] = [];
+    for (let n = 0; n < letters; n++) {
+      lettersSquares[i][n] = (
+        <LetterSquare
+          letter={keys[i][n]}
+          color={colors[i][n]}
+          key={i + "" + n}
+        />
+      );
+    }
+  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-4">
