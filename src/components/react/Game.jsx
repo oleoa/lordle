@@ -61,7 +61,7 @@ export default function Game(props) {
     // ---------- If the user clicked "Enter" ----------
     if (props.click == "Enter") {
       const writtenWord = keys[currentRow];
-      if (writtenWord.length < 5) return;
+      if (writtenWord.length < props.letters) return;
       let chosenWordArray = chosenWord.split("");
       let newColor = colors.map((rowArr) => [...rowArr]);
       for (let i = 0; i < writtenWord.length; i++) {
@@ -96,7 +96,7 @@ export default function Game(props) {
     }
 
     if (alphabet.includes(props.click)) {
-      if (currentLetter > 4) return;
+      if (currentLetter > props.letters - 1) return;
       const pressedKey = props.click.toUpperCase();
       setKey(currentRow, currentLetter, pressedKey);
       setCurrentLetter((prevLetter) => prevLetter + 1);
@@ -105,8 +105,15 @@ export default function Game(props) {
   // ---------- Checks if the user clicked ----------
 
   return (
-    <div className="w-96 flex flex-col items-center justify-center gap-4">
-      <div className="grid grid-cols-5 gap-4">{lettersSquares}</div>
+    <div className="flex flex-col items-center justify-center gap-4">
+      <div
+        className="grid gap-4"
+        style={{
+          gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
+        }}
+      >
+        {lettersSquares}
+      </div>
     </div>
   );
 }
