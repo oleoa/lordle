@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import LetterSquare from "./LetterSquare";
 import alphabet from "../../assets/alphabet.json";
 
-export default function Board() {
+export default function Game(props) {
   const chosenWord = "MAYBE";
 
-  const rows = 6;
-  const letters = 5;
+  const rows = props.rows;
+  const letters = props.letters;
 
   let lettersSquares = [];
   let keysArray = [];
@@ -24,6 +24,11 @@ export default function Board() {
   const setKey = (row, letter, value) => {
     let newKeys = keys.map((rowArr) => [...rowArr]);
     newKeys[row][letter] = value;
+    setKeys(newKeys);
+  };
+  const unsetKey = (row, letter) => {
+    let newKeys = keys.map((rowArr) => [...rowArr]);
+    newKeys[row].splice([letter], 1);
     setKeys(newKeys);
   };
 
@@ -45,14 +50,16 @@ export default function Board() {
   const [currentRow, setCurrentRow] = useState(0);
   const [currentLetter, setCurrentLetter] = useState(0);
 
-  const handleKeydown = (event) => {
-    console.log("Is listening!");
-
+  // ---------- Checks if the user clicked ----------
+  useEffect(() => {
+    // ---------- Checks if the click is part of the allowed clicks ----------
     const avaiableKeys = alphabet;
     avaiableKeys.push(...["Enter", "Backspace"]);
-    if (!avaiableKeys.includes(event.key)) return;
+    if (!avaiableKeys.includes(props.click)) return;
+    // ---------- Checks if the click is part of the allowed clicks ----------
 
-    if (event.key == "Enter") {
+    // ---------- If the user clicked "Enter" ----------
+    if (props.click == "Enter") {
       const writtenWord = keys[currentRow];
       if (writtenWord.length < 5) return;
       let chosenWordArray = chosenWord.split("");
@@ -64,33 +71,38 @@ export default function Board() {
           newColor[currentRow][i] = "yellow";
         }
       }
+
       setColors(newColor);
-      setCurrentRow((prevRow) => prevRow + 1);
-      setCurrentLetter(0);
+
+      if (
+        writtenWord.every((value, index) => value === chosenWordArray[index])
+      ) {
+        props.setGameStatus("won");
+      } else {
+        setCurrentRow((prevRow) => prevRow + 1);
+        setCurrentLetter(0);
+      }
       return;
     }
+    // ---------- If the user clicked "Enter" ----------
 
-    if (event.key == "Backspace") {
+    if (props.gameStatus == "won") return;
+
+    if (props.click == "Backspace") {
       if (currentLetter == 0) return;
-      setKey(currentRow, currentLetter - 1, "");
+      unsetKey(currentRow, currentLetter - 1);
       setCurrentLetter((prevLetter) => prevLetter - 1);
       return;
     }
 
-    if (alphabet.includes(event.key)) {
+    if (alphabet.includes(props.click)) {
       if (currentLetter > 4) return;
-      const pressedKey = event.key.toUpperCase();
+      const pressedKey = props.click.toUpperCase();
       setKey(currentRow, currentLetter, pressedKey);
       setCurrentLetter((prevLetter) => prevLetter + 1);
     }
-  };
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeydown);
-    return () => {
-      window.removeEventListener("keydown", handleKeydown);
-    };
-  });
+  }, [props.clickId]);
+  // ---------- Checks if the user clicked ----------
 
   return (
     <div className="w-96 flex flex-col items-center justify-center gap-4">
