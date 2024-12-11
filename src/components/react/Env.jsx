@@ -109,26 +109,26 @@ export default function Env() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
+    <div className="flex flex-col items-center justify-center gap-4 py-8">
       {gameStatus == "menu" && (
-        <div className="flex flex-col items-start justify-center gap-4">
+        <div className="flex flex-col items-start justify-center gap-4 h-full">
           <h1 className="text-5xl font-bold">Menu</h1>
-          <div className="grid lg:grid-cols-3 gap-4 justify-items-center">
-            <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4">
+          <div className="grid gap-4 justify-items-center">
+            <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg">
               <p>Rows</p>
-              <span className="w-10 bg">{rows}</span>
+              <span className="w-10">{rows}</span>
               <span className="rounded-lg px-4 py-2 bg-red-500">Less (E)</span>
               <span className="rounded-lg px-4 py-2 bg-blue-500">More (R)</span>
             </div>
-            <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4">
+            <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg">
               <p>Letters</p>
-              <span className="w-10 bg">{letters}</span>
+              <span className="w-10">{letters}</span>
               <span className="rounded-lg px-4 py-2 bg-red-500">Less (K)</span>
               <span className="rounded-lg px-4 py-2 bg-blue-500">More (L)</span>
             </div>
-            <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4">
+            <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg">
               <p>Language</p>
-              <span className="w-10 bg">{language}</span>
+              <span className="w-10">{language}</span>
               <span className="rounded-lg px-4 py-2 bg-red-500">
                 English (O)
               </span>
@@ -177,7 +177,8 @@ export default function Env() {
       )}
       {gameStatus == "lost" && (
         <div className="flex flex-col items-start justify-center gap-4 w-full">
-          <h1 className="text-5xl font-bold">You Lost!</h1>
+          <h1 className="text-4xl font-bold">You Lost!</h1>
+          <h2 className="text-xl font-bold">The word was: {chosenWord}</h2>
           <span className="rounded-lg bg-green-500 py-2 px-4">
             Play Again (Enter)
           </span>
