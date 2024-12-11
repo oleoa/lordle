@@ -1,0 +1,14 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Author from "../components/Author.astro";
+import Testings from "../components/react/Testing.jsx";
+---
+
+<Layout>
+    <Author />
+    <div
+        class="min-w-screen min-h-screen p-4 flex flex-col items-center justify-center gap-12"
+    >
+        <Testings client:load />
+    </div>
+</Layout>

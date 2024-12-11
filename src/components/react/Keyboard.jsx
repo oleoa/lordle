@@ -5,7 +5,7 @@ export default function Keyboard(props) {
     ["Z", "X", "C", "V", "B", "N", "M"],
   ];
   let color = {};
-  color["gray"] = "rgba(125, 132, 145)";
+  color["bg"] = "#1b1b1e";
   color["green"] = "rgba(77, 170, 87)";
   color["yellow"] = "rgba(255, 200, 87)";
   return (
@@ -25,9 +25,15 @@ export default function Keyboard(props) {
                     ? color["green"]
                     : props.chosenLettersKeyboard[keyboardKey].state == "100"
                       ? color["yellow"]
-                      : props.chosenLettersKeyboard[keyboardKey].state == "404"
-                        ? color["gray"]
-                        : "",
+                      : "",
+                borderColor:
+                  props.chosenLettersKeyboard[keyboardKey].state == "404"
+                    ? color["bg"]
+                    : "",
+                color:
+                  props.chosenLettersKeyboard[keyboardKey].state == "404"
+                    ? color["bg"]
+                    : "",
               }}
               className="w-8 h-8 border-2 border-white rounded-lg flex items-center justify-center"
             >

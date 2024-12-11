@@ -8,7 +8,8 @@ export default function Shortcuts(props) {
           <span>Less letters (←)</span>
           <span>More letters (→)</span>
           <span>English words (E)</span>
-          <span>Portuguese words [beta] (P)</span>
+          <span>Portuguese words (P)</span>
+          <span>Toggle have timer (T)</span>
           <span>Start (Enter)</span>
         </div>
       )}

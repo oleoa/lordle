@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import LetterSquare from "./LetterSquare";
 import alphabet from "../../assets/alphabet.json";
 
@@ -15,13 +15,15 @@ export default function Game(props) {
   // Creates the spaces for the letters and colors to be filled
   const [colors, setColors] = useState(Array(rows).fill([]));
   const [keys, setKeys] = useState(Array(rows).fill([]));
+
+  // Functions to set and unset a specific key when typing
   const setKey = (row, letter, value) => {
-    let newKeys = keys.map((rowArr) => [...rowArr]);
+    let newKeys = JSON.parse(JSON.stringify(keys));
     newKeys[row][letter] = value;
     setKeys(newKeys);
   };
   const unsetKey = (row, letter) => {
-    let newKeys = keys.map((rowArr) => [...rowArr]);
+    let newKeys = JSON.parse(JSON.stringify(keys));
     newKeys[row].splice([letter], 1);
     setKeys(newKeys);
   };
@@ -34,8 +36,25 @@ export default function Game(props) {
     setCurrentLetter(0);
   }, [props.round]);
 
+  // Controls the messages for the user
+  const [alert, setAlert] = useState("");
+  const createAlert = (alert) => {
+    setAlert(alert);
+    let interval = setInterval(() => {
+      setAlert("");
+      clearInterval(interval);
+    }, 750);
+  };
+
   // Tracks the users keyboard while in game
+  const isFirstRender = useRef(true);
   useEffect(() => {
+    if (isFirstRender.current) {
+      // Skip the first run
+      isFirstRender.current = false;
+      return;
+    }
+
     const avaiableKeys = alphabet;
     avaiableKeys.push(...["Enter", "Backspace", "Escape"]);
     if (!avaiableKeys.includes(props.click)) return;
@@ -45,19 +64,26 @@ export default function Game(props) {
       const writtenWord = keys[currentRow];
 
       // If the written word is shorter than the whole length returns
-      if (writtenWord.length < props.letters) return;
+      if (writtenWord.length < props.letters) {
+        createAlert("Not full length");
+        return;
+      }
 
       // Checks if the word is a word
-      if (!props.avaiableWords.includes(writtenWord.join(""))) return;
+      if (!props.avaiableWords.includes(writtenWord.join(""))) {
+        createAlert("That is not a word");
+        return;
+      }
 
       // Checks if there is any compatibility and colors it
       let chosenWordArray = chosenWord.split("");
       let newColor = colors.map((rowArr) => [...rowArr]);
+      let newKeyboard = { ...props.chosenLettersKeyboard };
       let tempChosenVerify = [...chosenWordArray];
       let tempWrittenVerify = [...writtenWord];
       for (let i = 0; i < tempWrittenVerify.length; i++) {
         if (tempWrittenVerify[i] == tempChosenVerify[i]) {
-          props.setChosenLetterKeyboard(tempWrittenVerify[i], "200");
+          newKeyboard[tempWrittenVerify[i]].state = "200";
           tempChosenVerify[i] = "";
           tempWrittenVerify[i] = "";
           newColor[currentRow][i] = "green";
@@ -68,8 +94,8 @@ export default function Game(props) {
           tempWrittenVerify[i] &&
           tempChosenVerify.includes(tempWrittenVerify[i])
         ) {
-          if (props.chosenLettersKeyboard[tempWrittenVerify[i]].state != "200")
-            props.setChosenLetterKeyboard(tempWrittenVerify[i], "100");
+          if (newKeyboard[tempWrittenVerify[i]].state != "200")
+            newKeyboard[tempWrittenVerify[i]].state = "100";
           tempChosenVerify[tempChosenVerify.indexOf(tempWrittenVerify[i])] = "";
           tempWrittenVerify[i] = "";
           newColor[currentRow][i] = "yellow";
@@ -78,14 +104,15 @@ export default function Game(props) {
       for (let i = 0; i < writtenWord.length; i++) {
         if (tempWrittenVerify[i]) {
           if (
-            props.chosenLettersKeyboard[tempWrittenVerify[i]].state != "200" &&
-            props.chosenLettersKeyboard[tempWrittenVerify[i]].state != "100"
+            newKeyboard[tempWrittenVerify[i]].state != "200" &&
+            newKeyboard[tempWrittenVerify[i]].state != "100"
           )
-            props.setChosenLetterKeyboard(tempWrittenVerify[i], "404");
+            newKeyboard[tempWrittenVerify[i]].state = "404";
           newColor[currentRow][i] = "gray";
         }
       }
       setColors(newColor);
+      props.setChosenLettersKeyboard(newKeyboard);
 
       // Checks if the written word is equal to the chosen one
       if (
@@ -128,7 +155,7 @@ export default function Game(props) {
       setKey(currentRow, currentLetter, pressedKey);
       setCurrentLetter((prevLetter) => prevLetter + 1);
     }
-  }, [props.clickId]);
+  }, [props.clickObserver]);
 
   // Creates the components
   let lettersSquares = [];
@@ -151,37 +178,46 @@ export default function Game(props) {
   let secondLettersSquaresHalf = lettersSquares.slice(midIndex);
 
   return (
-    <div className="flex items-center justify-center gap-12 w-full">
-      {rows < 8 && (
-        <div
-          className="grid gap-4"
-          style={{
-            gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
-          }}
-        >
-          {lettersSquares}
+    <>
+      {alert && (
+        <div className="fixed top-0 w-screen h-screen flex items-center justify-center z-50">
+          <div className="bg-red-500 p-4 rounded-lg giggle">
+            <p className="text-5xl">{alert}</p>
+          </div>
         </div>
       )}
-      {rows >= 8 && (
-        <>
+      <div className="flex items-center justify-center gap-12 w-full">
+        {rows < 8 && (
           <div
             className="grid gap-4"
             style={{
               gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
             }}
           >
-            {firstLettersSquaresHalf}
+            {lettersSquares}
           </div>
-          <div
-            className="grid gap-4"
-            style={{
-              gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
-            }}
-          >
-            {secondLettersSquaresHalf}
-          </div>
-        </>
-      )}
-    </div>
+        )}
+        {rows >= 8 && (
+          <>
+            <div
+              className="grid gap-4"
+              style={{
+                gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
+              }}
+            >
+              {firstLettersSquaresHalf}
+            </div>
+            <div
+              className="grid gap-4"
+              style={{
+                gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
+              }}
+            >
+              {secondLettersSquaresHalf}
+            </div>
+          </>
+        )}
+      </div>
+    </>
   );
 }

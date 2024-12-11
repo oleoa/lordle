@@ -5,56 +5,49 @@ import Minimap from "./Minimap";
 import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
 import Keyboard from "./Keyboard";
+import Timer from "./Timer";
 import KeyboardStatus from "../../assets/keyboard.json";
 
 export default function Env() {
-  // Track the game data
-  const [round, setRound] = useState(1);
+  // Static configs for the game
   const rowsMinLimit = 1;
   const rowsMaxLimit = 10;
   const lettersMinLimit = 2;
   const lettersMaxLimit = 11;
-  const [chosenLettersKeyboard, setChosenLettersKeyboard] = useState({
-    ...KeyboardStatus,
-  });
-  const setChosenLetterKeyboard = (letter, state) => {
-    setChosenLettersKeyboard((prev) => ({
-      ...prev,
-      [letter]: {
-        ...prev[letter],
-        state: state,
-      },
-    }));
-  };
+
+  // Track the game data
+  const [round, setRound] = useState(1);
+  const keyboard = JSON.parse(JSON.stringify(KeyboardStatus));
+  const [chosenLettersKeyboard, setChosenLettersKeyboard] = useState(keyboard);
   const resetKeyboardColors = () => {
-    setChosenLettersKeyboard({ ...KeyboardStatus });
+    setChosenLettersKeyboard(keyboard);
   };
 
   // Sets the rules of the game
   const [rows, setRows] = useState(6);
   const [letters, setLetters] = useState(5);
   const [language, setLanguage] = useState("EN");
+  const [haveTimer, setHaveTimer] = useState(true);
   const moreRows = () => {
-    if (rows >= rowsMaxLimit) setRows(rowsMaxLimit);
-    else setRows((prevRows) => prevRows + 1);
+    setRows((r) => (r >= rowsMaxLimit ? rowsMaxLimit : r + 1));
   };
   const lessRows = () => {
-    if (rows <= rowsMinLimit) setRows(rowsMinLimit);
-    else setRows((prevRows) => prevRows - 1);
+    setRows((r) => (r <= rowsMinLimit ? rowsMinLimit : r - 1));
   };
   const moreLetters = () => {
-    if (letters >= lettersMaxLimit) setLetters(lettersMaxLimit);
-    else setLetters((prevLetters) => prevLetters + 1);
+    setLetters((l) => (l >= lettersMaxLimit ? lettersMaxLimit : l + 1));
   };
   const lessLetters = () => {
-    if (letters <= lettersMinLimit) setLetters(lettersMinLimit);
-    else setLetters((prevLetters) => prevLetters - 1);
+    setLetters((l) => (l <= lettersMinLimit ? lettersMinLimit : l - 1));
   };
   const setLangEN = () => {
     setLanguage("EN");
   };
   const setLangPT = () => {
     setLanguage("PT");
+  };
+  const toggleHaveTimer = () => {
+    setHaveTimer((hv) => !hv);
   };
 
   // Track the game status
@@ -65,13 +58,13 @@ export default function Env() {
   };
 
   // Track the keyboard click
-  const [clickId, setClickId] = useState(0);
+  const [clickObserver, setClickObserver] = useState(0);
   const [click, setClick] = useState();
   const handleKeydown = (event) => {
     setClick(event.key);
 
     if (gameStatus == "ready") {
-      setClickId((prevClickId) => prevClickId + 1);
+      setClickObserver((prevClickId) => prevClickId + 1);
       return;
     }
 
@@ -87,6 +80,7 @@ export default function Env() {
       if (event.key == "ArrowUp") lessRows();
       if (event.key == "e") setLangEN();
       if (event.key == "p") setLangPT();
+      if (event.key == "t") toggleHaveTimer();
       return;
     }
 
@@ -119,7 +113,7 @@ export default function Env() {
     const randomWords = RandomWords[language].filter(
       (word) => word.length == letters,
     );
-    const min = 1;
+    const min = 0;
     const max = randomWords.length - 1;
     const randomInRange = Math.floor(Math.random() * (max - min + 1)) + min;
     setChosenWord(randomWords[randomInRange].toUpperCase());
@@ -135,7 +129,12 @@ export default function Env() {
       {gameStatus == "menu" && (
         <>
           <Minimap gameStatus={gameStatus} letters={letters} rows={rows} />
-          <Menu rows={rows} letters={letters} language={language} />
+          <Menu
+            haveTimer={haveTimer}
+            rows={rows}
+            letters={letters}
+            language={language}
+          />
         </>
       )}
       {(gameStatus == "ready" ||
@@ -150,12 +149,13 @@ export default function Env() {
             gameStatus={gameStatus}
             setGameStatus={handleGameStatus}
             round={round}
-            clickId={clickId}
+            clickObserver={clickObserver}
             click={click}
             chosenLettersKeyboard={chosenLettersKeyboard}
-            setChosenLetterKeyboard={setChosenLetterKeyboard}
+            setChosenLettersKeyboard={setChosenLettersKeyboard}
           />
           <Keyboard chosenLettersKeyboard={chosenLettersKeyboard} />
+          {haveTimer && <Timer gameStatus={gameStatus} />}
         </>
       )}
       <Shortcuts gameStatus={gameStatus} chosenWord={chosenWord} />
