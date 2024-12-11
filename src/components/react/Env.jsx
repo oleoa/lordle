@@ -49,6 +49,7 @@ export default function Env() {
   const [click, setClick] = useState();
   const handleKeydown = (event) => {
     setClick(event.key);
+    console.log(event.key);
 
     if (gameStatus == "ready") {
       setClickId((prevClickId) => prevClickId + 1);
@@ -60,11 +61,11 @@ export default function Env() {
         setGameStatus("ready");
         createNewChosenWord();
       }
-      if (event.key == "l") moreLetters();
-      if (event.key == "k") lessLetters();
-      if (event.key == "r") moreRows();
-      if (event.key == "e") lessRows();
-      if (event.key == "o") setLangEN();
+      if (event.key == "ArrowRight") moreLetters();
+      if (event.key == "ArrowLeft") lessLetters();
+      if (event.key == "ArrowDown") moreRows();
+      if (event.key == "ArrowUp") lessRows();
+      if (event.key == "e") setLangEN();
       if (event.key == "p") setLangPT();
       return;
     }
@@ -117,20 +118,20 @@ export default function Env() {
             <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg">
               <p>Rows</p>
               <span className="w-10">{rows}</span>
-              <span className="rounded-lg px-4 py-2 bg-red-500">Less (E)</span>
-              <span className="rounded-lg px-4 py-2 bg-blue-500">More (R)</span>
+              <span className="rounded-lg px-4 py-2 bg-red-500">Less (↑)</span>
+              <span className="rounded-lg px-4 py-2 bg-blue-500">More (↓)</span>
             </div>
             <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg">
               <p>Letters</p>
               <span className="w-10">{letters}</span>
-              <span className="rounded-lg px-4 py-2 bg-red-500">Less (K)</span>
-              <span className="rounded-lg px-4 py-2 bg-blue-500">More (L)</span>
+              <span className="rounded-lg px-4 py-2 bg-red-500">Less (←)</span>
+              <span className="rounded-lg px-4 py-2 bg-blue-500">More (→)</span>
             </div>
             <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg">
               <p>Language</p>
               <span className="w-10">{language}</span>
               <span className="rounded-lg px-4 py-2 bg-red-500">
-                English (O)
+                English (E)
               </span>
               <span className="rounded-lg px-4 py-2 bg-blue-500">
                 Portuguese (P)
