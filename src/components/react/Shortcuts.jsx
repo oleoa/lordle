@@ -20,12 +20,8 @@ export default function Shortcuts(props) {
       {props.gameStatus == "won" && (
         <div className="flex flex-col items-start justify-center gap-4 w-full">
           <h1 className="text-5xl font-bold">You Won!</h1>
-          <span className="rounded-lg bg-green-500 py-2 px-4">
-            Play Again (Enter)
-          </span>
-          <button className="rounded-lg bg-blue-500 py-2 px-4">
-            Menu (Escape)
-          </button>
+          <span>Play Again (Enter)</span>
+          <button>Menu (Escape)</button>
         </div>
       )}
       {props.gameStatus == "lost" && (

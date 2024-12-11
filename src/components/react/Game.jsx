@@ -51,15 +51,29 @@ export default function Game(props) {
       if (!props.avaiableWords.includes(writtenWord.join(""))) return;
 
       // Checks if there is any compatibility and colors it
-      // TO FIX THE DUPLICATE CASE LETTER
       let chosenWordArray = chosenWord.split("");
       let newColor = colors.map((rowArr) => [...rowArr]);
-      for (let i = 0; i < writtenWord.length; i++) {
-        if (writtenWord[i] == chosenWordArray[i]) {
+      let tempChosenVerify = [...chosenWordArray];
+      let tempWrittenVerify = [...writtenWord];
+      for (let i = 0; i < tempWrittenVerify.length; i++) {
+        if (tempWrittenVerify[i] == tempChosenVerify[i]) {
+          tempChosenVerify[i] = "";
+          tempWrittenVerify[i] = "";
           newColor[currentRow][i] = "green";
-        } else if (chosenWordArray.includes(writtenWord[i])) {
+        }
+      }
+      for (let i = 0; i < writtenWord.length; i++) {
+        if (
+          tempWrittenVerify[i] &&
+          tempChosenVerify.includes(tempWrittenVerify[i])
+        ) {
+          tempChosenVerify[tempChosenVerify.indexOf(tempWrittenVerify[i])] = "";
+          tempWrittenVerify[i] = "";
           newColor[currentRow][i] = "yellow";
-        } else {
+        }
+      }
+      for (let i = 0; i < writtenWord.length; i++) {
+        if (tempWrittenVerify[i]) {
           newColor[currentRow][i] = "gray";
         }
       }

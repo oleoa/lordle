@@ -1,7 +1,8 @@
 export default function Minimap(props) {
   const rows = props.rows;
   const letters = props.letters;
-  const minimap = Array(rows * letters).fill();
+  const length = rows * letters;
+  const minimap = [...Array(length).keys()];
   return (
     <div className="fixed top-0 left-0 py-24 px-4">
       <div className="px-4 pt-2 pb-4 rounded-lg border-2 border-white flex flex-col gap-2">
@@ -15,7 +16,10 @@ export default function Minimap(props) {
           }}
         >
           {minimap.map((map) => (
-            <div className="w-4 h-4 border-2 border-white rounded flex items-center justify-center"></div>
+            <div
+              key={map}
+              className="w-4 h-4 border-2 border-white rounded flex items-center justify-center"
+            ></div>
           ))}
         </div>
       </div>
