@@ -68,7 +68,8 @@ export default function Game(props) {
           tempWrittenVerify[i] &&
           tempChosenVerify.includes(tempWrittenVerify[i])
         ) {
-          props.setChosenLetterKeyboard(tempWrittenVerify[i], "100");
+          if (props.chosenLettersKeyboard[tempWrittenVerify[i]].state != "200")
+            props.setChosenLetterKeyboard(tempWrittenVerify[i], "100");
           tempChosenVerify[tempChosenVerify.indexOf(tempWrittenVerify[i])] = "";
           tempWrittenVerify[i] = "";
           newColor[currentRow][i] = "yellow";
@@ -76,7 +77,11 @@ export default function Game(props) {
       }
       for (let i = 0; i < writtenWord.length; i++) {
         if (tempWrittenVerify[i]) {
-          props.setChosenLetterKeyboard(tempWrittenVerify[i], "404");
+          if (
+            props.chosenLettersKeyboard[tempWrittenVerify[i]].state != "200" &&
+            props.chosenLettersKeyboard[tempWrittenVerify[i]].state != "100"
+          )
+            props.setChosenLetterKeyboard(tempWrittenVerify[i], "404");
           newColor[currentRow][i] = "gray";
         }
       }

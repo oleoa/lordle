@@ -152,6 +152,7 @@ export default function Env() {
             round={round}
             clickId={clickId}
             click={click}
+            chosenLettersKeyboard={chosenLettersKeyboard}
             setChosenLetterKeyboard={setChosenLetterKeyboard}
           />
           <Keyboard chosenLettersKeyboard={chosenLettersKeyboard} />
