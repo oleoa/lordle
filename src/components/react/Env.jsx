@@ -4,6 +4,7 @@ import Game from "./Game";
 import Minimap from "./Minimap";
 import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
+import KeyboardStatus from "../../assets/keyboard.json";
 
 export default function Env() {
   // Track the game data
@@ -12,6 +13,21 @@ export default function Env() {
   const rowsMaxLimit = 10;
   const lettersMinLimit = 2;
   const lettersMaxLimit = 11;
+  const [chosenLettersKeyboard, setChosenLettersKeyboard] = useState({
+    ...KeyboardStatus,
+  });
+  const setChosenLetterKeyboard = (letter, state) => {
+    setChosenLettersKeyboard((prev) => ({
+      ...prev,
+      [letter]: {
+        ...prev[letter],
+        state: state,
+      },
+    }));
+  };
+  const resetKeyboardColors = () => {
+    setChosenLettersKeyboard({ ...KeyboardStatus });
+  };
 
   // Sets the rules of the game
   const [rows, setRows] = useState(6);
@@ -62,6 +78,7 @@ export default function Env() {
       if (event.key == "Enter") {
         setGameStatus("ready");
         createNewChosenWord();
+        resetKeyboardColors();
       }
       if (event.key == "ArrowRight") moreLetters();
       if (event.key == "ArrowLeft") lessLetters();
@@ -77,6 +94,7 @@ export default function Env() {
         createNewChosenWord();
         setRound((prevRound) => prevRound + 1);
         setGameStatus("ready");
+        resetKeyboardColors();
         return;
       }
       if (event.key == "Escape") {
@@ -113,28 +131,30 @@ export default function Env() {
 
   return (
     <>
+      <Minimap
+        gameStatus={gameStatus}
+        letters={letters}
+        rows={rows}
+        chosenLettersKeyboard={chosenLettersKeyboard}
+      />
       {gameStatus == "menu" && (
-        <>
-          <Minimap letters={letters} rows={rows} />
-          <Menu rows={rows} letters={letters} language={language} />
-        </>
+        <Menu rows={rows} letters={letters} language={language} />
       )}
       {(gameStatus == "ready" ||
         gameStatus == "won" ||
         gameStatus == "lost") && (
-        <>
-          <Game
-            rows={rows}
-            letters={letters}
-            chosenWord={chosenWord}
-            avaiableWords={avaiableWords}
-            gameStatus={gameStatus}
-            setGameStatus={handleGameStatus}
-            round={round}
-            clickId={clickId}
-            click={click}
-          />
-        </>
+        <Game
+          rows={rows}
+          letters={letters}
+          chosenWord={chosenWord}
+          avaiableWords={avaiableWords}
+          gameStatus={gameStatus}
+          setGameStatus={handleGameStatus}
+          round={round}
+          clickId={clickId}
+          click={click}
+          setChosenLetterKeyboard={setChosenLetterKeyboard}
+        />
       )}
       <Shortcuts gameStatus={gameStatus} chosenWord={chosenWord} />
     </>
