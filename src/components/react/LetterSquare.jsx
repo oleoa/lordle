@@ -6,7 +6,7 @@ export default function LetterSquare(props) {
   return (
     <div
       id={props.chance}
-      className="w-16 h-16 border-2 border-white rounded-lg flex items-center justify-center"
+      className="w-16 h-16 border-2 border-white rounded-lg flex items-center justify-center bg"
       style={{ backgroundColor: color }}
     >
       <p className="text-xl font-bold">{props.letter}</p>

@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import RandomWords from "../../assets/words.json";
 import Game from "./Game";
+import Minimap from "./Minimap";
+import Menu from "./Menu";
+import Shortcuts from "./Shortcuts";
 
 export default function Env() {
   // Track the game data
@@ -49,7 +52,6 @@ export default function Env() {
   const [click, setClick] = useState();
   const handleKeydown = (event) => {
     setClick(event.key);
-    console.log(event.key);
 
     if (gameStatus == "ready") {
       setClickId((prevClickId) => prevClickId + 1);
@@ -110,84 +112,31 @@ export default function Env() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 py-8">
+    <>
       {gameStatus == "menu" && (
-        <div className="flex flex-col items-start justify-center gap-4 h-full">
-          <h1 className="text-5xl font-bold">Menu</h1>
-          <div className="grid gap-4 justify-items-center">
-            <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg">
-              <p>Rows</p>
-              <span className="w-10">{rows}</span>
-              <span className="rounded-lg px-4 py-2 bg-red-500">Less (↑)</span>
-              <span className="rounded-lg px-4 py-2 bg-blue-500">More (↓)</span>
-            </div>
-            <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg">
-              <p>Letters</p>
-              <span className="w-10">{letters}</span>
-              <span className="rounded-lg px-4 py-2 bg-red-500">Less (←)</span>
-              <span className="rounded-lg px-4 py-2 bg-blue-500">More (→)</span>
-            </div>
-            <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg">
-              <p>Language</p>
-              <span className="w-10">{language}</span>
-              <span className="rounded-lg px-4 py-2 bg-red-500">
-                English (E)
-              </span>
-              <span className="rounded-lg px-4 py-2 bg-blue-500">
-                Portuguese (P)
-              </span>
-            </div>
-          </div>
-          <span className="bg-green-500 rounded-lg px-4 py-2 text-center">
-            Start (Enter)
-          </span>
-        </div>
+        <>
+          <Minimap letters={letters} rows={rows} />
+          <Menu rows={rows} letters={letters} language={language} />
+        </>
       )}
       {(gameStatus == "ready" ||
         gameStatus == "won" ||
         gameStatus == "lost") && (
-        <Game
-          rows={rows}
-          letters={letters}
-          chosenWord={chosenWord}
-          avaiableWords={avaiableWords}
-          gameStatus={gameStatus}
-          round={round}
-          setGameStatus={handleGameStatus}
-          clickId={clickId}
-          click={click}
-        />
+        <>
+          <Game
+            rows={rows}
+            letters={letters}
+            chosenWord={chosenWord}
+            avaiableWords={avaiableWords}
+            gameStatus={gameStatus}
+            setGameStatus={handleGameStatus}
+            round={round}
+            clickId={clickId}
+            click={click}
+          />
+        </>
       )}
-      {gameStatus == "ready" && (
-        <div className="flex flex-col items-start justify-center gap-4 w-full">
-          <span className="rounded-lg bg-red-500 py-2 px-4">
-            Leave (Escape)
-          </span>
-        </div>
-      )}
-      {gameStatus == "won" && (
-        <div className="flex flex-col items-start justify-center gap-4 w-full">
-          <h1 className="text-5xl font-bold">You Won!</h1>
-          <span className="rounded-lg bg-green-500 py-2 px-4">
-            Play Again (Enter)
-          </span>
-          <button className="rounded-lg bg-blue-500 py-2 px-4">
-            Menu (Escape)
-          </button>
-        </div>
-      )}
-      {gameStatus == "lost" && (
-        <div className="flex flex-col items-start justify-center gap-4 w-full">
-          <h1 className="text-4xl font-bold">You Lost!</h1>
-          <h2 className="text-xl font-bold">The word was: {chosenWord}</h2>
-          <span className="rounded-lg bg-green-500 py-2 px-4">
-            Play Again (Enter)
-          </span>
-          <button className="rounded-lg bg-blue-500 py-2 px-4">
-            Menu (Escape)
-          </button>
-        </div>
-      )}
-    </div>
+      <Shortcuts gameStatus={gameStatus} chosenWord={chosenWord} />
+    </>
   );
 }

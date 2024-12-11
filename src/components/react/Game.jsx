@@ -124,7 +124,7 @@ export default function Game(props) {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
+    <div className="flex flex-col items-center justify-center gap-4 w-full">
       <div
         className="grid gap-4"
         style={{
