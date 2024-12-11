@@ -140,16 +140,43 @@ export default function Game(props) {
     }
   }
 
+  // Divide the lettersSquares into two differents arrays
+  let midIndex = Math.ceil(lettersSquares.length / 2);
+  let firstLettersSquaresHalf = lettersSquares.slice(0, midIndex);
+  let secondLettersSquaresHalf = lettersSquares.slice(midIndex);
+
   return (
-    <div className="flex flex-col items-center justify-center gap-4 w-full">
-      <div
-        className="grid gap-4"
-        style={{
-          gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
-        }}
-      >
-        {lettersSquares}
-      </div>
+    <div className="flex items-center justify-center gap-12 w-full">
+      {rows < 8 && (
+        <div
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
+          }}
+        >
+          {lettersSquares}
+        </div>
+      )}
+      {rows >= 8 && (
+        <>
+          <div
+            className="grid gap-4"
+            style={{
+              gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
+            }}
+          >
+            {firstLettersSquaresHalf}
+          </div>
+          <div
+            className="grid gap-4"
+            style={{
+              gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
+            }}
+          >
+            {secondLettersSquaresHalf}
+          </div>
+        </>
+      )}
     </div>
   );
 }

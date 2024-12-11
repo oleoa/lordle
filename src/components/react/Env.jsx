@@ -4,6 +4,7 @@ import Game from "./Game";
 import Minimap from "./Minimap";
 import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
+import Keyboard from "./Keyboard";
 import KeyboardStatus from "../../assets/keyboard.json";
 
 export default function Env() {
@@ -131,30 +132,30 @@ export default function Env() {
 
   return (
     <>
-      <Minimap
-        gameStatus={gameStatus}
-        letters={letters}
-        rows={rows}
-        chosenLettersKeyboard={chosenLettersKeyboard}
-      />
       {gameStatus == "menu" && (
-        <Menu rows={rows} letters={letters} language={language} />
+        <>
+          <Minimap gameStatus={gameStatus} letters={letters} rows={rows} />
+          <Menu rows={rows} letters={letters} language={language} />
+        </>
       )}
       {(gameStatus == "ready" ||
         gameStatus == "won" ||
         gameStatus == "lost") && (
-        <Game
-          rows={rows}
-          letters={letters}
-          chosenWord={chosenWord}
-          avaiableWords={avaiableWords}
-          gameStatus={gameStatus}
-          setGameStatus={handleGameStatus}
-          round={round}
-          clickId={clickId}
-          click={click}
-          setChosenLetterKeyboard={setChosenLetterKeyboard}
-        />
+        <>
+          <Game
+            rows={rows}
+            letters={letters}
+            chosenWord={chosenWord}
+            avaiableWords={avaiableWords}
+            gameStatus={gameStatus}
+            setGameStatus={handleGameStatus}
+            round={round}
+            clickId={clickId}
+            click={click}
+            setChosenLetterKeyboard={setChosenLetterKeyboard}
+          />
+          <Keyboard chosenLettersKeyboard={chosenLettersKeyboard} />
+        </>
       )}
       <Shortcuts gameStatus={gameStatus} chosenWord={chosenWord} />
     </>
