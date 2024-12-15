@@ -2,6 +2,11 @@
 import Layout from "../layouts/Layout.astro";
 import Author from "../components/Author.astro";
 import Testings from "../components/react/Testing.jsx";
+
+import { supabase } from "../lib/supabase";
+
+const { data, error } = await supabase.from("todos").select("*");
+console.log("data -> ", data);
 ---
 
 <Layout>
@@ -10,5 +15,14 @@ import Testings from "../components/react/Testing.jsx";
         class="min-w-screen min-h-screen p-4 flex flex-col items-center justify-center gap-12"
     >
         <Testings client:load />
+        {
+            data && (
+                <ul>
+                    {data.map((entry) => (
+                        <li>{entry.name}</li>
+                    ))}
+                </ul>
+            )
+        }
     </div>
 </Layout>
