@@ -1,17 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Author from "../components/Author.astro";
 import Env from "../components/react/Env.jsx";
-
-import Background from "../assets/wallpaper.webp";
 ---
 
-<Layout>
-    <Author />
-    <div
-        class="min-w-screen min-h-screen p-4 bg-cover bg-center flex flex-col items-center justify-center gap-12"
-        style={"background-image: url(" + Background.src + ");"}
-    >
+<Layout padding={false}>
+    <div class="p-4 flex flex-col items-center justify-center gap-12 h-full">
         <Env client:load />
     </div>
 </Layout>

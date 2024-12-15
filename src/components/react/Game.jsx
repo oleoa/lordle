@@ -180,7 +180,7 @@ export default function Game(props) {
   return (
     <>
       {alert && (
-        <div className="fixed top-0 w-screen h-screen flex items-center justify-center z-50">
+        <div className="fixed top-0 w-screen h-full flex items-center justify-center z-50">
           <div className="bg-red-500 p-4 rounded-lg giggle">
             <p className="text-5xl">{alert}</p>
           </div>

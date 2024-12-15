@@ -35,12 +35,27 @@ try {
 }
 
 const email = session.data.user?.email;
+
+let { data, error } = await supabase.from("personal-records").select("*");
 ---
 
 <Layout title="dashboard">
-    <h1>Welcome {email}</h1>
-    <p>We are happy to see you here</p>
-    <form action="/api/auth/signout">
-        <button type="submit">Sign out</button>
-    </form>
+    <main class="flex flex-col justify-start items-center h-full w-full">
+        <h1>Welcome</h1>
+        <h2>We are happy to see you here</h2>
+        <h3>{email}</h3>
+        <h4 class="w-full p-4">My Records:</h4>
+        {
+            data && (
+                <div class="flex gap-4 w-full p-4">
+                    {data.map((entry) => (
+                        <div class="border-2 border-white rounded-lg p-4 flex flex-col gap-4">
+                            <p>Time: {entry.time}</p>
+                            <p>Answer: {entry.answer}</p>
+                        </div>
+                    ))}
+                </div>
+            )
+        }
+    </main>
 </Layout>

@@ -1,0 +1,40 @@
+---
+import Meteor from "../assets/meteor.svg";
+import Signout from "../assets/signout.svg";
+import User from "../assets/user.svg";
+const url = Astro.url;
+---
+
+<nav
+    class="fixed top-0 left-0 w-full flex items-center justify-between p-4 z-50 h-24"
+>
+    {
+        url.pathname != "/" ? (
+            <a class="navItem" href="/">
+                <img class="w-8 h-8" src={Meteor.src} alt="Meteor" />
+            </a>
+        ) : (
+            <span />
+        )
+    }
+    <div class="flex gap-4">
+        {
+            url.pathname == "/dashboard" && (
+                <a href="/api/auth/signout" class="navItem">
+                    <img class="w-8 h-8" src={Signout.src} alt="Signout" />
+                </a>
+            )
+        }
+        {
+            url.pathname != "/dashboard" &&
+            url.pathname != "/signin" &&
+            url.pathname != "/register" ? (
+                <a class="navItem" href="/dashboard">
+                    <img class="w-8 h-8" src={User.src} alt="User" />
+                </a>
+            ) : (
+                ""
+            )
+        }
+    </div>
+</nav>

@@ -1,3 +1,10 @@
+---
+import "../lib/master.css";
+import Navbar from "../components/Navbar.astro";
+import Background from "../assets/wallpaper.webp";
+const { title, padding = true } = Astro.props;
+---
+
 <!doctype html>
 <html lang="en">
     <head>
@@ -5,37 +12,13 @@
         <meta name="viewport" content="width=device-width" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
-        <title>Wordly</title>
+        <title>{title || "Wordly"}</title>
     </head>
-    <body class="text-white bg min-h-screen">
+    <body
+        class={"text-white bg-cover bg-center " + (padding && "pt-24")}
+        style={"background-image: url(" + Background.src + ");"}
+    >
+        <Navbar />
         <slot />
-        <style is:global>
-            @keyframes giggle {
-                0% {
-                    transform: rotate(0deg);
-                }
-                25% {
-                    transform: rotate(5deg);
-                }
-                50% {
-                    transform: rotate(-5deg);
-                }
-                75% {
-                    transform: rotate(3deg);
-                }
-                100% {
-                    transform: rotate(0deg);
-                }
-            }
-
-            /* Apply the animation to the target element */
-            .giggle {
-                animation: giggle 0.5s ease-in-out;
-            }
-
-            .bg {
-                background-color: #1b1b1e;
-            }
-        </style>
     </body>
 </html>

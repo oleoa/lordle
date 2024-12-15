@@ -20,7 +20,7 @@ export default function LetterSquare(props) {
     <div
       id={props.chance}
       className={
-        "w-16 h-16 border-2 border-white rounded-lg flex items-center justify-center bg " +
+        "w-16 h-16 border-2 border-white rounded-lg flex items-center justify-center bg-blur " +
         (animate && "giggle")
       }
       style={{ backgroundColor: color }}
