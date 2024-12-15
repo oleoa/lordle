@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import RandomWords from "../../assets/words.json";
+import { allWords, answers } from "../../assets/wordle.ts";
 import Game from "./Game";
 import Minimap from "./Minimap";
 import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
 import Keyboard from "./Keyboard";
 import Timer from "./Timer";
+import Countdown from "./Countdown";
 import KeyboardStatus from "../../assets/keyboard.json";
 
 export default function Env() {
@@ -14,6 +16,8 @@ export default function Env() {
   const rowsMaxLimit = 10;
   const lettersMinLimit = 2;
   const lettersMaxLimit = 11;
+  const countdownMinLimit = 5;
+  const countdownMaxLimit = 1800;
 
   // Track the game data
   const [round, setRound] = useState(1);
@@ -28,6 +32,8 @@ export default function Env() {
   const [letters, setLetters] = useState(5);
   const [language, setLanguage] = useState("EN");
   const [haveTimer, setHaveTimer] = useState(true);
+  const [haveCountdown, setHaveCountdown] = useState(false);
+  const [countdown, setCountdown] = useState(10);
   const moreRows = () => {
     setRows((r) => (r >= rowsMaxLimit ? rowsMaxLimit : r + 1));
   };
@@ -46,9 +52,31 @@ export default function Env() {
   const setLangPT = () => {
     setLanguage("PT");
   };
-  const toggleHaveTimer = () => {
-    setHaveTimer((hv) => !hv);
+  const toggleTimer = () => {
+    if (haveTimer) {
+      setHaveTimer(false);
+      setHaveCountdown(true);
+    }
+    if (haveCountdown) {
+      setHaveTimer(false);
+      setHaveCountdown(false);
+    }
+    if (!haveTimer && !haveCountdown) {
+      setHaveTimer(true);
+      setHaveCountdown(false);
+    }
   };
+  const moreTimeCounter = () => {
+    setCountdown((cd) =>
+      cd >= countdownMaxLimit ? countdownMaxLimit : cd + 5,
+    );
+  };
+  const lessTimeCounter = () => {
+    setCountdown((cd) =>
+      cd <= countdownMinLimit ? countdownMinLimit : cd - 5,
+    );
+  };
+  const resetCountdown = () => {};
 
   // Track the game status
   const [gameStatus, setGameStatus] = useState("menu");
@@ -80,7 +108,9 @@ export default function Env() {
       if (event.key == "ArrowUp") lessRows();
       if (event.key == "e") setLangEN();
       if (event.key == "p") setLangPT();
-      if (event.key == "t") toggleHaveTimer();
+      if (event.key == "t") toggleTimer();
+      if (event.key == "m") moreTimeCounter();
+      if (event.key == "n") lessTimeCounter();
       return;
     }
 
@@ -90,6 +120,7 @@ export default function Env() {
         setRound((prevRound) => prevRound + 1);
         setGameStatus("ready");
         resetKeyboardColors();
+        resetCountdown();
         return;
       }
       if (event.key == "Escape") {
@@ -110,7 +141,9 @@ export default function Env() {
   const [avaiableWords, setAvaiableWords] = useState();
   const [chosenWord, setChosenWord] = useState();
   const createNewChosenWord = () => {
-    const randomWords = RandomWords[language].filter(
+    const allWordsAvaiableForAnswers = [...answers, ...RandomWords["EN"]];
+    const allWordsAvaiable = [...allWords, ...RandomWords["EN"]];
+    const randomWords = allWordsAvaiableForAnswers.filter(
       (word) => word.length == letters,
     );
     const min = 0;
@@ -118,7 +151,7 @@ export default function Env() {
     const randomInRange = Math.floor(Math.random() * (max - min + 1)) + min;
     setChosenWord(randomWords[randomInRange].toUpperCase());
     setAvaiableWords(
-      randomWords.map((word) => {
+      allWordsAvaiable.map((word) => {
         return word.toUpperCase();
       }),
     );
@@ -130,6 +163,9 @@ export default function Env() {
         <>
           <Minimap gameStatus={gameStatus} letters={letters} rows={rows} />
           <Menu
+            countdown={countdown}
+            setCountdown={setCountdown}
+            haveCountdown={haveCountdown}
             haveTimer={haveTimer}
             rows={rows}
             letters={letters}
@@ -155,7 +191,18 @@ export default function Env() {
             setChosenLettersKeyboard={setChosenLettersKeyboard}
           />
           <Keyboard chosenLettersKeyboard={chosenLettersKeyboard} />
-          {haveTimer && <Timer gameStatus={gameStatus} />}
+          <div className="fixed bottom-0 right-0 min-w-48 text-center p-4 flex flex-col items-center justify-start">
+            {haveCountdown && (
+              <Countdown
+                gameStatus={gameStatus}
+                countdown={countdown}
+                round={round}
+                haveCountdown={haveCountdown}
+                setGameStatus={handleGameStatus}
+              />
+            )}
+            {haveTimer && <Timer gameStatus={gameStatus} />}
+          </div>
         </>
       )}
       <Shortcuts gameStatus={gameStatus} chosenWord={chosenWord} />

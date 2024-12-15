@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
 
-export default function Timer(props) {
-  const [cs, setCs] = useState(0);
+export default function Countdown(props) {
+  const [cs, setCs] = useState(props.countdown * 100);
 
   useEffect(() => {
     let timer;
 
     if (props.gameStatus == "ready") {
-      setCs(0);
       timer = setInterval(() => {
-        setCs((prevCentiseconds) => prevCentiseconds + 1);
+        if (cs <= 0) {
+          setCs(0);
+          props.setGameStatus("lost");
+          clearInterval(timer);
+        } else setCs((prevCentiseconds) => prevCentiseconds - 1);
       }, 10);
     }
 
@@ -20,7 +23,11 @@ export default function Timer(props) {
     return () => {
       clearInterval(timer);
     };
-  }, [props.gameStatus]);
+  }, [props.gameStatus, cs]);
+
+  useEffect(() => {
+    setCs(props.countdown * 100);
+  }, [props.round]);
 
   const formatTime = (time) => {
     // Get the true values
@@ -55,5 +62,6 @@ export default function Timer(props) {
       </>
     );
   };
+
   return <div className="text-4xl w-40">{formatTime(cs)}</div>;
 }

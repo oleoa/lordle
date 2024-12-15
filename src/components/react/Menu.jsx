@@ -10,9 +10,23 @@ export default function Menu(props) {
           <span className="text-end w-full">{props.letters}</span>
           <p>Language</p>
           <span className="text-end w-full">{props.language}</span>
-          <p>Have Timer</p>
+          <p>Clock</p>
           <span className="text-end w-full">
-            {props.haveTimer ? "TRUE" : "FALSE"}
+            {props.haveTimer && "Timer"}
+            {props.haveCountdown && (
+              <div className="flex gap-4">
+                {props.countdown && (
+                  <p>
+                    {Math.floor(props.countdown / 60)}:
+                    {props.countdown % 60 < 10
+                      ? "0" + (props.countdown % 60)
+                      : props.countdown % 60}
+                  </p>
+                )}
+                <p>Countdown</p>
+              </div>
+            )}
+            {!props.haveTimer && !props.haveCountdown && "None"}
           </span>
         </div>
       </div>

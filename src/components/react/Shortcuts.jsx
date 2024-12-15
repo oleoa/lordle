@@ -9,7 +9,9 @@ export default function Shortcuts(props) {
           <span>More letters (→)</span>
           <span>English words (E)</span>
           <span>Portuguese words (P)</span>
-          <span>Toggle have timer (T)</span>
+          <span>Toggle timer / countdown (T)</span>
+          <span>More time countdown (m)</span>
+          <span>Less time countdown (n)</span>
           <span>Start (Enter)</span>
         </div>
       )}
