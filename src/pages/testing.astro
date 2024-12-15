@@ -5,8 +5,7 @@ import Testings from "../components/react/Testing.jsx";
 
 import { supabase } from "../lib/supabase";
 
-const { data, error } = await supabase.from("todos").select("*");
-console.log("data -> ", data);
+let { data, error } = await supabase.from("personal-records").select("*");
 ---
 
 <Layout>
@@ -17,11 +16,14 @@ console.log("data -> ", data);
         <Testings client:load />
         {
             data && (
-                <ul>
+                <div class="grid grid-cols-4 gap-4 w-full">
                     {data.map((entry) => (
-                        <li>{entry.name}</li>
+                        <div class="border-2 border-white rounded-lg p-4 flex flex-col gap-4">
+                            <h2>Time: {entry.time}</h2>
+                            <h2>Answer: {entry.answer}</h2>
+                        </div>
                     ))}
-                </ul>
+                </div>
             )
         }
     </div>
