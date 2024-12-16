@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import RandomWords from "../../assets/words.json";
-import { allWords, answers } from "../../assets/wordle.ts";
+import AvaiableWords from "../../assets/words.json";
 import Game from "./Game";
 import Minimap from "./Minimap";
 import Menu from "./Menu";
@@ -16,7 +15,7 @@ export default function Env() {
   const rowsMaxLimit = 10;
   const lettersMinLimit = 2;
   const lettersMaxLimit = 11;
-  const countdownMinLimit = 5;
+  const countdownMinLimit = 10;
   const countdownMaxLimit = 1800;
 
   // Track the game data
@@ -30,10 +29,9 @@ export default function Env() {
   // Sets the rules of the game
   const [rows, setRows] = useState(6);
   const [letters, setLetters] = useState(5);
-  const [language, setLanguage] = useState("EN");
   const [haveTimer, setHaveTimer] = useState(true);
   const [haveCountdown, setHaveCountdown] = useState(false);
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(60);
   const moreRows = () => {
     setRows((r) => (r >= rowsMaxLimit ? rowsMaxLimit : r + 1));
   };
@@ -45,12 +43,6 @@ export default function Env() {
   };
   const lessLetters = () => {
     setLetters((l) => (l <= lettersMinLimit ? lettersMinLimit : l - 1));
-  };
-  const setLangEN = () => {
-    setLanguage("EN");
-  };
-  const setLangPT = () => {
-    setLanguage("PT");
   };
   const toggleTimer = () => {
     if (haveTimer) {
@@ -67,14 +59,16 @@ export default function Env() {
     }
   };
   const moreTimeCounter = () => {
-    setCountdown((cd) =>
-      cd >= countdownMaxLimit ? countdownMaxLimit : cd + 5,
-    );
+    haveCountdown &&
+      setCountdown((cd) =>
+        cd >= countdownMaxLimit ? countdownMaxLimit : cd + 10,
+      );
   };
   const lessTimeCounter = () => {
-    setCountdown((cd) =>
-      cd <= countdownMinLimit ? countdownMinLimit : cd - 5,
-    );
+    haveCountdown &&
+      setCountdown((cd) =>
+        cd <= countdownMinLimit ? countdownMinLimit : cd - 10,
+      );
   };
   const resetCountdown = () => {};
 
@@ -106,11 +100,9 @@ export default function Env() {
       if (event.key == "ArrowLeft") lessLetters();
       if (event.key == "ArrowDown") moreRows();
       if (event.key == "ArrowUp") lessRows();
-      if (event.key == "e") setLangEN();
-      if (event.key == "p") setLangPT();
       if (event.key == "t") toggleTimer();
-      if (event.key == "m") moreTimeCounter();
-      if (event.key == "n") lessTimeCounter();
+      if (event.key == "+" || event.key == "=") moreTimeCounter();
+      if (event.key == "-") lessTimeCounter();
       return;
     }
 
@@ -141,9 +133,8 @@ export default function Env() {
   const [avaiableWords, setAvaiableWords] = useState();
   const [chosenWord, setChosenWord] = useState();
   const createNewChosenWord = () => {
-    const allWordsAvaiableForAnswers = [...answers, ...RandomWords["EN"]];
-    const allWordsAvaiable = [...allWords, ...RandomWords["EN"]];
-    const randomWords = allWordsAvaiableForAnswers.filter(
+    const allWordsAvaiable = [...AvaiableWords];
+    const randomWords = allWordsAvaiable.filter(
       (word) => word.length == letters,
     );
     const min = 0;
@@ -169,7 +160,6 @@ export default function Env() {
             haveTimer={haveTimer}
             rows={rows}
             letters={letters}
-            language={language}
           />
         </>
       )}

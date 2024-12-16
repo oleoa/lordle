@@ -7,11 +7,8 @@ export default function Shortcuts(props) {
           <span>More rows (↓)</span>
           <span>Less letters (←)</span>
           <span>More letters (→)</span>
-          <span>English words (E)</span>
-          <span>Portuguese words (P)</span>
           <span>Toggle timer / countdown (T)</span>
-          <span>More time countdown (m)</span>
-          <span>Less time countdown (n)</span>
+          <span>Manage time countdown (-/+)</span>
           <span>Start (Enter)</span>
         </div>
       )}

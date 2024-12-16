@@ -8,8 +8,6 @@ export default function Menu(props) {
           <span className="text-end w-full">{props.rows}</span>
           <p>Letters</p>
           <span className="text-end w-full">{props.letters}</span>
-          <p>Language</p>
-          <span className="text-end w-full">{props.language}</span>
           <p>Clock</p>
           <span className="text-end w-full">
             {props.haveTimer && "Timer"}
