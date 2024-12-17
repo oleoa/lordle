@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { formatTime } from "../../lib/functions";
 
-// [ haveTimer, haveCountdown, countdown, gameStatus, setGameStatus ]
+// [ haveTimer, haveCountdown, countdown, gameStatus, setGameStatus, setLastCs ]
 export default function Clock(props) {
   // Get the countdown value in centiseconds
   const countdownCS = props.countdown * 100;
@@ -17,6 +17,9 @@ export default function Clock(props) {
       setCs(0);
       setS(props.haveCountdown ? countdownCS : 0);
       timer = setInterval(() => setCs((cs) => cs + 1), 10);
+    }
+    if (props.gameStatus == "won") {
+      props.setLastCs(cs);
     }
     return () => {
       clearInterval(timer);

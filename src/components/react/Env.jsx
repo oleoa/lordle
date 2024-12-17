@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { allWords, answers } from "../../assets/wordle.ts";
 import AvaiableWordsAnyLetters from "../../assets/words.json";
+import KeyboardStatus from "../../assets/keyboard.json";
 import Game from "./Game";
 import Minimap from "./Minimap";
 import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
 import Keyboard from "./Keyboard";
 import Clock from "./Clock";
-import KeyboardStatus from "../../assets/keyboard.json";
 
 export default function Env() {
   // Static configs for the game
@@ -24,6 +24,16 @@ export default function Env() {
   const [chosenLettersKeyboard, setChosenLettersKeyboard] = useState(keyboard);
   const resetKeyboardColors = () => {
     setChosenLettersKeyboard(keyboard);
+  };
+
+  // Controls the messages for the user
+  const [alert, setAlert] = useState("");
+  const createAlert = (alert) => {
+    setAlert(alert);
+    let interval = setInterval(() => {
+      setAlert("");
+      clearInterval(interval);
+    }, 750);
   };
 
   // Sets the rules of the game
@@ -143,13 +153,51 @@ export default function Env() {
     const min = 0;
     const max = randomWords.length - 1;
     const randomInRange = Math.floor(Math.random() * (max - min + 1)) + min;
-    setChosenWord(randomWords[randomInRange].toUpperCase());
+    // setChosenWord(randomWords[randomInRange].toUpperCase());
+    setChosenWord("UNION");
     setAvaiableWords(
       allAvaiableGuesses.map((word) => {
         return word.toUpperCase();
       }),
     );
   };
+
+  // Tracks for the user's record
+  const [lastRecord, setLastRecord] = useState();
+  const [lastCs, setLastCs] = useState(false);
+  const getLastRecord = async () => {
+    const response = await fetch("/api/records");
+    const data = await response.json();
+    const times = data.map((r) => {
+      return r.time;
+    });
+    setLastRecord(Math.min(...times));
+  };
+  const setNewLastRecord = async (lastCs) => {
+    const response = await fetch("/api/records", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        time: lastCs,
+        rows: rows,
+        letters: letters,
+        answer: chosenWord,
+        attemps: null,
+      }),
+    });
+  };
+  useEffect(() => {
+    getLastRecord();
+  }, []);
+  useEffect(() => {
+    if (lastCs && lastCs < lastRecord) {
+      createAlert("New Record!");
+      setNewLastRecord(lastCs);
+      setLastRecord(lastCs);
+    }
+  }, [lastCs]);
 
   return (
     <>
@@ -171,6 +219,7 @@ export default function Env() {
         gameStatus == "lost") && (
         <>
           <Game
+            createAlert={createAlert}
             rows={rows}
             letters={letters}
             chosenWord={chosenWord}
@@ -186,6 +235,7 @@ export default function Env() {
           <Keyboard chosenLettersKeyboard={chosenLettersKeyboard} />
           <div className="fixed bottom-0 right-0 min-w-48 text-center p-4 flex flex-col items-center justify-start">
             <Clock
+              setLastCs={setLastCs}
               haveTimer={haveTimer}
               haveCountdown={haveCountdown}
               countdown={countdown}
@@ -193,6 +243,13 @@ export default function Env() {
               setGameStatus={handleGameStatus}
             />
           </div>
+          {alert && (
+            <div className="fixed top-0 w-screen h-full flex items-center justify-center z-50">
+              <div className="bg-red-500 p-4 rounded-lg giggle">
+                <p className="text-5xl">{alert}</p>
+              </div>
+            </div>
+          )}
         </>
       )}
       <Shortcuts gameStatus={gameStatus} chosenWord={chosenWord} />

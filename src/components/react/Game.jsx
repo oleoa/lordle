@@ -36,16 +36,6 @@ export default function Game(props) {
     setCurrentLetter(0);
   }, [props.round]);
 
-  // Controls the messages for the user
-  const [alert, setAlert] = useState("");
-  const createAlert = (alert) => {
-    setAlert(alert);
-    let interval = setInterval(() => {
-      setAlert("");
-      clearInterval(interval);
-    }, 750);
-  };
-
   // Tracks the users keyboard while in game
   const isFirstRender = useRef(true);
   useEffect(() => {
@@ -65,13 +55,13 @@ export default function Game(props) {
 
       // If the written word is shorter than the whole length returns
       if (writtenWord.length < props.letters) {
-        createAlert("Not full length");
+        props.createAlert("Not full length");
         return;
       }
 
       // Checks if the word is a word
       if (!props.avaiableWords.includes(writtenWord.join(""))) {
-        createAlert("That is not a word");
+        props.createAlert("That is not a word");
         return;
       }
 
@@ -178,46 +168,37 @@ export default function Game(props) {
   let secondLettersSquaresHalf = lettersSquares.slice(midIndex);
 
   return (
-    <>
-      {alert && (
-        <div className="fixed top-0 w-screen h-full flex items-center justify-center z-50">
-          <div className="bg-red-500 p-4 rounded-lg giggle">
-            <p className="text-5xl">{alert}</p>
-          </div>
+    <div className="flex items-center justify-center gap-12 w-full">
+      {rows < 8 && (
+        <div
+          className="grid gap-4"
+          style={{
+            gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
+          }}
+        >
+          {lettersSquares}
         </div>
       )}
-      <div className="flex items-center justify-center gap-12 w-full">
-        {rows < 8 && (
+      {rows >= 8 && (
+        <>
           <div
             className="grid gap-4"
             style={{
               gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
             }}
           >
-            {lettersSquares}
+            {firstLettersSquaresHalf}
           </div>
-        )}
-        {rows >= 8 && (
-          <>
-            <div
-              className="grid gap-4"
-              style={{
-                gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
-              }}
-            >
-              {firstLettersSquaresHalf}
-            </div>
-            <div
-              className="grid gap-4"
-              style={{
-                gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
-              }}
-            >
-              {secondLettersSquaresHalf}
-            </div>
-          </>
-        )}
-      </div>
-    </>
+          <div
+            className="grid gap-4"
+            style={{
+              gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
+            }}
+          >
+            {secondLettersSquaresHalf}
+          </div>
+        </>
+      )}
+    </div>
   );
 }
