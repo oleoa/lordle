@@ -157,8 +157,7 @@ export default function Env() {
     const min = 0;
     const max = randomWords.length - 1;
     const randomInRange = Math.floor(Math.random() * (max - min + 1)) + min;
-    // setChosenWord(randomWords[randomInRange].toUpperCase());
-    setChosenWord("UNION");
+    setChosenWord(randomWords[randomInRange].toUpperCase());
     setAvaiableWords(
       allAvaiableGuesses.map((word) => {
         return word.toUpperCase();

@@ -10,6 +10,9 @@ const refreshToken = cookies.get("sb-refresh-token");
 if (accessToken && refreshToken) {
     return redirect("/dashboard");
 }
+
+const url = Astro.url;
+const errorMessage = url.searchParams.get("error");
 ---
 
 <Layout title="Sign in">
@@ -19,6 +22,7 @@ if (accessToken && refreshToken) {
             <input type="email" name="email" placeholder="Email" />
             <Password client:load />
             <button class="btn-green" type="submit">Sign in</button>
+            {errorMessage && <span>{JSON.parse(errorMessage)}</span>}
             <p class="w-full flex justify-between">
                 <a href="/register">Create an account</a>
                 <a href="/register">Forgot password?</a>

@@ -1,6 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Password from "../components/react/Password.jsx";
+
+const url = Astro.url;
+const errorMessage = url.searchParams.get("error");
 ---
 
 <Layout title="Register">
@@ -10,6 +13,7 @@ import Password from "../components/react/Password.jsx";
             <input type="email" name="email" placeholder="Email" />
             <Password client:load />
             <button class="btn-green" type="submit">Register</button>
+            {errorMessage && <span>{JSON.parse(errorMessage)}</span>}
             <p>Already have an account? <a href="/signin">Sign in</a></p>
         </form>
     </main>
