@@ -8,6 +8,7 @@ import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
 import Keyboard from "./Keyboard";
 import Clock from "./Clock";
+import Message from "./Message.jsx";
 
 export default function Env() {
   // Static configs for the game
@@ -27,13 +28,15 @@ export default function Env() {
   };
 
   // Controls the messages for the user
-  const [alert, setAlert] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "" });
   const createAlert = (alert) => {
-    setAlert(alert);
-    let interval = setInterval(() => {
-      setAlert("");
-      clearInterval(interval);
-    }, 750);
+    setMessage({ text: alert, type: "alert" });
+  };
+  const createMessage = (message) => {
+    setMessage({ text: message, type: "info" });
+  };
+  const createCongrats = (message) => {
+    setMessage({ text: message, type: "congrats" });
   };
 
   // Sets the rules of the game
@@ -123,6 +126,7 @@ export default function Env() {
         setGameStatus("ready");
         resetKeyboardColors();
         resetCountdown();
+        setMessage({ text: "", type: "" });
         return;
       }
       if (event.key == "Escape") {
@@ -193,7 +197,7 @@ export default function Env() {
   }, []);
   useEffect(() => {
     if (lastCs && lastCs < lastRecord) {
-      createAlert("New Record!");
+      createCongrats("New Record!");
       setNewLastRecord(lastCs);
       setLastRecord(lastCs);
     }
@@ -219,6 +223,7 @@ export default function Env() {
         gameStatus == "lost") && (
         <>
           <Game
+            createMessage={createMessage}
             createAlert={createAlert}
             rows={rows}
             letters={letters}
@@ -243,15 +248,9 @@ export default function Env() {
               setGameStatus={handleGameStatus}
             />
           </div>
-          {alert && (
-            <div className="fixed top-0 w-screen h-full flex items-center justify-center z-50">
-              <div className="bg-red-500 p-4 rounded-lg giggle">
-                <p className="text-5xl">{alert}</p>
-              </div>
-            </div>
-          )}
         </>
       )}
+      <Message message={message} setMessage={setMessage} />
       <Shortcuts gameStatus={gameStatus} chosenWord={chosenWord} />
     </>
   );
