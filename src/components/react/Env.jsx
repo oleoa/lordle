@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import AvaiableWords from "../../assets/words.json";
+import { allWords, answers } from "../../assets/wordle.ts";
+import AvaiableWordsAnyLetters from "../../assets/words.json";
 import Game from "./Game";
 import Minimap from "./Minimap";
 import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
 import Keyboard from "./Keyboard";
-import Timer from "./Timer";
-import Countdown from "./Countdown";
+import Clock from "./Clock";
 import KeyboardStatus from "../../assets/keyboard.json";
 
 export default function Env() {
@@ -75,7 +75,7 @@ export default function Env() {
   // Track the game status
   const [gameStatus, setGameStatus] = useState("menu");
   const handleGameStatus = (status) => {
-    if (!["won", "lost", "ready", "menu", "playing"].includes(status)) return;
+    if (!["won", "lost", "ready", "menu"].includes(status)) return;
     setGameStatus(status);
   };
 
@@ -133,8 +133,11 @@ export default function Env() {
   const [avaiableWords, setAvaiableWords] = useState();
   const [chosenWord, setChosenWord] = useState();
   const createNewChosenWord = () => {
-    const allWordsAvaiable = [...AvaiableWords];
-    const randomWords = allWordsAvaiable.filter(
+    const allAvaiableAnswers =
+      letters == 5 ? [...answers] : [...AvaiableWordsAnyLetters];
+    const allAvaiableGuesses =
+      letters == 5 ? [...allWords] : [...AvaiableWordsAnyLetters];
+    const randomWords = allAvaiableAnswers.filter(
       (word) => word.length == letters,
     );
     const min = 0;
@@ -142,7 +145,7 @@ export default function Env() {
     const randomInRange = Math.floor(Math.random() * (max - min + 1)) + min;
     setChosenWord(randomWords[randomInRange].toUpperCase());
     setAvaiableWords(
-      allWordsAvaiable.map((word) => {
+      allAvaiableGuesses.map((word) => {
         return word.toUpperCase();
       }),
     );
@@ -182,16 +185,13 @@ export default function Env() {
           />
           <Keyboard chosenLettersKeyboard={chosenLettersKeyboard} />
           <div className="fixed bottom-0 right-0 min-w-48 text-center p-4 flex flex-col items-center justify-start">
-            {haveCountdown && (
-              <Countdown
-                gameStatus={gameStatus}
-                countdown={countdown}
-                round={round}
-                haveCountdown={haveCountdown}
-                setGameStatus={handleGameStatus}
-              />
-            )}
-            {haveTimer && <Timer gameStatus={gameStatus} />}
+            <Clock
+              haveTimer={haveTimer}
+              haveCountdown={haveCountdown}
+              countdown={countdown}
+              gameStatus={gameStatus}
+              setGameStatus={handleGameStatus}
+            />
           </div>
         </>
       )}
