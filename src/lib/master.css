@@ -44,7 +44,7 @@ form.auth {
 }
 
 input {
-    @apply px-4 py-2 rounded-lg w-full;
+    @apply px-4 py-2 rounded-lg w-full bg-transparent border-2 border-white;
 }
 
 .btn-green {

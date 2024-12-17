@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import Password from "../components/react/Password.jsx";
 
 const { cookies, redirect } = Astro;
 
@@ -15,13 +16,8 @@ if (accessToken && refreshToken) {
     <main class="center px-20">
         <form action="/api/auth/signin" method="post" class="auth">
             <h2>Sign in</h2>
-            <input type="email" name="email" id="email" placeholder="Email" />
-            <input
-                type="password"
-                name="password"
-                id="password"
-                placeholder="Password"
-            />
+            <input type="email" name="email" placeholder="Email" />
+            <Password client:load />
             <button class="btn-green" type="submit">Sign in</button>
             <p class="w-full flex justify-between">
                 <a href="/register">Create an account</a>
