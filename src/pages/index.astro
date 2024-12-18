@@ -1,10 +1,28 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Env from "../components/react/Env.jsx";
+
+import Env from "../components/react/Env";
+
+const rowsMinLimit = import.meta.env.rowsMinLimit;
+const rowsMaxLimit = import.meta.env.rowsMaxLimit;
+const lettersMinLimit = import.meta.env.lettersMinLimit;
+const lettersMaxLimit = import.meta.env.lettersMaxLimit;
+const countdownMinLimit = import.meta.env.countdownMinLimit;
+const countdownMaxLimit = import.meta.env.countdownMaxLimit;
 ---
 
 <Layout padding={false}>
     <div class="p-4 flex flex-col items-center justify-center gap-12 h-full">
-        <Env client:load />
+        <Env
+            client:load
+            rules={{
+                rowsMinLimit: rowsMinLimit,
+                rowsMaxLimit: rowsMaxLimit,
+                lettersMinLimit: lettersMinLimit,
+                lettersMaxLimit: lettersMaxLimit,
+                countdownMinLimit: countdownMinLimit,
+                countdownMaxLimit: countdownMaxLimit,
+            }}
+        />
     </div>
 </Layout>

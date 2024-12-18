@@ -6,19 +6,11 @@ import Game from "./Game";
 import Minimap from "./Minimap";
 import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
-import Keyboard from "./Keyboard";
+import VirtualKeyboard from "./VirtualKeyboard";
 import Clock from "./Clock";
 import Message from "./Message.jsx";
 
-export default function Env() {
-  // Static configs for the game
-  const rowsMinLimit = 1;
-  const rowsMaxLimit = 10;
-  const lettersMinLimit = 2;
-  const lettersMaxLimit = 11;
-  const countdownMinLimit = 10;
-  const countdownMaxLimit = 1800;
-
+export default function Env(props) {
   // Track the game data
   const [round, setRound] = useState(1);
   const keyboard = JSON.parse(JSON.stringify(KeyboardStatus));
@@ -46,16 +38,24 @@ export default function Env() {
   const [haveCountdown, setHaveCountdown] = useState(false);
   const [countdown, setCountdown] = useState(60);
   const moreRows = () => {
-    setRows((r) => (r >= rowsMaxLimit ? rowsMaxLimit : r + 1));
+    setRows((r) =>
+      r >= props.rules.rowsMaxLimit ? props.rules.rowsMaxLimit : r + 1,
+    );
   };
   const lessRows = () => {
-    setRows((r) => (r <= rowsMinLimit ? rowsMinLimit : r - 1));
+    setRows((r) =>
+      r <= props.rules.rowsMinLimit ? props.rules.rowsMinLimit : r - 1,
+    );
   };
   const moreLetters = () => {
-    setLetters((l) => (l >= lettersMaxLimit ? lettersMaxLimit : l + 1));
+    setLetters((l) =>
+      l >= props.rules.lettersMaxLimit ? props.rules.lettersMaxLimit : l + 1,
+    );
   };
   const lessLetters = () => {
-    setLetters((l) => (l <= lettersMinLimit ? lettersMinLimit : l - 1));
+    setLetters((l) =>
+      l <= props.rules.lettersMinLimit ? props.rules.lettersMinLimit : l - 1,
+    );
   };
   const toggleTimer = () => {
     if (haveTimer) {
@@ -74,13 +74,17 @@ export default function Env() {
   const moreTimeCounter = () => {
     haveCountdown &&
       setCountdown((cd) =>
-        cd >= countdownMaxLimit ? countdownMaxLimit : cd + 10,
+        cd >= props.rules.countdownMaxLimit
+          ? props.rules.countdownMaxLimit
+          : cd + 10,
       );
   };
   const lessTimeCounter = () => {
     haveCountdown &&
       setCountdown((cd) =>
-        cd <= countdownMinLimit ? countdownMinLimit : cd - 10,
+        cd <= props.rules.countdownMinLimit
+          ? props.rules.countdownMinLimit
+          : cd - 10,
       );
   };
   const resetCountdown = () => {};
@@ -190,6 +194,7 @@ export default function Env() {
         attemps: null,
       }),
     });
+    console.log(response);
   };
   useEffect(() => {
     getLastRecord();
@@ -236,7 +241,7 @@ export default function Env() {
             chosenLettersKeyboard={chosenLettersKeyboard}
             setChosenLettersKeyboard={setChosenLettersKeyboard}
           />
-          <Keyboard chosenLettersKeyboard={chosenLettersKeyboard} />
+          <VirtualKeyboard chosenLettersKeyboard={chosenLettersKeyboard} />
           <div className="fixed bottom-0 right-0 min-w-48 text-center p-4 flex flex-col items-center justify-start">
             <Clock
               setLastCs={setLastCs}
