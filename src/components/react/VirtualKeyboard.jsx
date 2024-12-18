@@ -21,19 +21,19 @@ export default function VirtualKeyboard(props) {
               key={keyboardKey}
               style={{
                 backgroundColor:
-                  props.chosenLettersKeyboard[keyboardKey].state == "200"
+                  props.virtualKeyboard[keyboardKey].state == "200"
                     ? color["green"]
-                    : props.chosenLettersKeyboard[keyboardKey].state == "100"
+                    : props.virtualKeyboard[keyboardKey].state == "100"
                       ? color["yellow"]
-                      : props.chosenLettersKeyboard[keyboardKey].state == "404"
+                      : props.virtualKeyboard[keyboardKey].state == "404"
                         ? color["none"]
                         : "",
                 borderColor:
-                  props.chosenLettersKeyboard[keyboardKey].state == "404"
+                  props.virtualKeyboard[keyboardKey].state == "404"
                     ? color["none"]
                     : "",
                 color:
-                  props.chosenLettersKeyboard[keyboardKey].state == "404"
+                  props.virtualKeyboard[keyboardKey].state == "404"
                     ? color["none"]
                     : "",
               }}

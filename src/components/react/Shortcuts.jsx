@@ -28,7 +28,7 @@ export default function Shortcuts(props) {
         <div className="flex flex-col items-start justify-center gap-4 w-full">
           <h1 className="text-4xl font-bold">You Lost!</h1>
           <h2 className="text-xl font-bold flex flex-col underline border-2 border-white rounded-lg w-min px-2 py-1">
-            {props.chosenWord}
+            {props.answer}
           </h2>
           <span>Play Again (Enter)</span>
           <span>Menu (Escape)</span>

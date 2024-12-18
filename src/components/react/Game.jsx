@@ -4,7 +4,7 @@ import alphabet from "../../assets/alphabet.json";
 
 export default function Game(props) {
   // Indicates the rules the game will be played with
-  const chosenWord = props.chosenWord;
+  const answer = props.answer;
   const rows = props.rows;
   const letters = props.letters;
 
@@ -66,10 +66,10 @@ export default function Game(props) {
       }
 
       // Checks if there is any compatibility and colors it
-      let chosenWordArray = chosenWord.split("");
+      let answerArray = answer.split("");
       let newColor = colors.map((rowArr) => [...rowArr]);
-      let newKeyboard = { ...props.chosenLettersKeyboard };
-      let tempChosenVerify = [...chosenWordArray];
+      let newKeyboard = { ...props.virtualKeyboard };
+      let tempChosenVerify = [...answerArray];
       let tempWrittenVerify = [...writtenWord];
       for (let i = 0; i < tempWrittenVerify.length; i++) {
         if (tempWrittenVerify[i] == tempChosenVerify[i]) {
@@ -102,12 +102,10 @@ export default function Game(props) {
         }
       }
       setColors(newColor);
-      props.setChosenLettersKeyboard(newKeyboard);
+      props.setVirtualKeyboard(newKeyboard);
 
       // Checks if the written word is equal to the chosen one
-      if (
-        writtenWord.every((value, index) => value === chosenWordArray[index])
-      ) {
+      if (writtenWord.every((value, index) => value === answerArray[index])) {
         props.setGameStatus("won");
         return;
       } else {

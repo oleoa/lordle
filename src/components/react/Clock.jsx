@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
+
 import { formatTime } from "../../lib/functions";
 
-// [ haveTimer, haveCountdown, countdown, gameStatus, setGameStatus, setLastCs ]
 export default function Clock(props) {
   // Get the countdown value in centiseconds
   const countdownCS = props.countdown * 100;
@@ -35,10 +35,10 @@ export default function Clock(props) {
   }, [cs]);
 
   return (
-    <>
+    <div className="fixed bottom-0 right-0 min-w-48 text-center p-4 flex flex-col items-center justify-start">
       {(props.haveTimer || props.haveCountdown) && (
         <div className="text-4xl w-40">{formatTime(s)}</div>
       )}
-    </>
+    </div>
   );
 }
