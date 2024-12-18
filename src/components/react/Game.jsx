@@ -14,9 +14,9 @@ export default function Game(props) {
 
   // Creates the spaces for the letters and colors to be filled
   const [colors, setColors] = useState(Array(rows).fill([]));
-  const [keys, setKeys] = useState(Array(rows).fill([]));
 
   // Functions to set and unset a specific key when typing
+  const [keys, setKeys] = useState(Array(rows).fill([]));
   const setKey = (row, letter, value) => {
     let newKeys = JSON.parse(JSON.stringify(keys));
     newKeys[row][letter] = value;
@@ -55,13 +55,13 @@ export default function Game(props) {
 
       // If the written word is shorter than the whole length returns
       if (writtenWord.length < props.letters) {
-        props.createAlert("Not full length");
+        props.setMessage(["Not full length", "alert"]);
         return;
       }
 
       // Checks if the word is a word
       if (!props.avaiableWords.includes(writtenWord.join(""))) {
-        props.createAlert("That is not a word");
+        props.setMessage(["That is not a word", "alert"]);
         return;
       }
 

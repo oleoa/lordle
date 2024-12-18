@@ -1,18 +1,20 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
+
 import { allWords, answers } from "../../assets/wordle.ts";
 import AvaiableWordsAnyLetters from "../../assets/words.json";
+
 import KeyboardStatus from "../../assets/keyboard.json";
+
 import Game from "./Game";
 import Minimap from "./Minimap";
 import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
 import VirtualKeyboard from "./VirtualKeyboard";
 import Clock from "./Clock";
-import Message from "./Message.jsx";
+import Message from "./Message";
 
 export default function Env(props) {
-  // Track the game data
-  const [round, setRound] = useState(1);
+  // Track the virtual keyboard
   const keyboard = JSON.parse(JSON.stringify(KeyboardStatus));
   const [chosenLettersKeyboard, setChosenLettersKeyboard] = useState(keyboard);
   const resetKeyboardColors = () => {
@@ -20,16 +22,7 @@ export default function Env(props) {
   };
 
   // Controls the messages for the user
-  const [message, setMessage] = useState({ text: "", type: "" });
-  const createAlert = (alert) => {
-    setMessage({ text: alert, type: "alert" });
-  };
-  const createMessage = (message) => {
-    setMessage({ text: message, type: "info" });
-  };
-  const createCongrats = (message) => {
-    setMessage({ text: message, type: "congrats" });
-  };
+  const [message, setMessage] = useState(["", ""]);
 
   // Sets the rules of the game
   const [rows, setRows] = useState(6);
@@ -37,6 +30,7 @@ export default function Env(props) {
   const [haveTimer, setHaveTimer] = useState(true);
   const [haveCountdown, setHaveCountdown] = useState(false);
   const [countdown, setCountdown] = useState(60);
+  const [round, setRound] = useState(1);
   const moreRows = () => {
     setRows((r) =>
       r >= props.rules.rowsMaxLimit ? props.rules.rowsMaxLimit : r + 1,
@@ -87,7 +81,6 @@ export default function Env(props) {
           : cd - 10,
       );
   };
-  const resetCountdown = () => {};
 
   // Track the game status
   const [gameStatus, setGameStatus] = useState("menu");
@@ -129,7 +122,6 @@ export default function Env(props) {
         setRound((prevRound) => prevRound + 1);
         setGameStatus("ready");
         resetKeyboardColors();
-        resetCountdown();
         setMessage({ text: "", type: "" });
         return;
       }
@@ -227,17 +219,16 @@ export default function Env(props) {
         gameStatus == "lost") && (
         <>
           <Game
-            createMessage={createMessage}
-            createAlert={createAlert}
             rows={rows}
             letters={letters}
             chosenWord={chosenWord}
             avaiableWords={avaiableWords}
             gameStatus={gameStatus}
             setGameStatus={handleGameStatus}
+            setMessage={setMessage}
             round={round}
-            clickObserver={clickObserver}
             click={click}
+            clickObserver={clickObserver}
             chosenLettersKeyboard={chosenLettersKeyboard}
             setChosenLettersKeyboard={setChosenLettersKeyboard}
           />
