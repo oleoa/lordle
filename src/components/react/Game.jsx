@@ -37,8 +37,8 @@ export default function Game(props) {
       return;
     }
 
-    const avaiableKeys = alphabet;
-    avaiableKeys.push(...["Enter", "Backspace", "Escape"]);
+    const avaiableKeys = [...alphabet];
+    avaiableKeys.push(...["Enter", "Backspace", "Escape", "/"]);
     if (!avaiableKeys.includes(props.click)) return;
 
     if (props.click == "Enter") {
@@ -149,8 +149,12 @@ export default function Game(props) {
     // Takes the player back to the menu
     if (props.click == "Escape") props.setGameStatus("menu");
 
-    // Deletes one character
+    // Resets the game
+    if (props.click == "/") props.setGameStatus("lost");
+
+    // Deletes a letter
     if (props.click == "Backspace") {
+      // Deletes one character
       if (cl == 0) return;
       setTypedMap(setNewTypedMapDeleteKey(typedMap, currentRow, cl));
       setCurrentLetter((cl) => cl - 1);

@@ -137,7 +137,11 @@ export default function Env(props) {
   return (
     <>
       <Message message={message} setMessage={setMessage} />
-      <Shortcuts gameStatus={gameStatus} answer={answer} />
+      <Shortcuts
+        lastRecord={lastRecord}
+        gameStatus={gameStatus}
+        answer={answer}
+      />
       {gameStatus == "menu" && (
         <>
           <Minimap gameStatus={gameStatus} letters={letters} rows={rows} />

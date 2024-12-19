@@ -5,6 +5,7 @@ import Layout from "../layouts/Layout.astro";
 import { supabase } from "../lib/supabase";
 
 import TypedMap from "../components/react/TypedMap";
+import Timer from "../components/react/Timer";
 
 const accessToken = Astro.cookies.get("sb-access-token");
 const refreshToken = Astro.cookies.get("sb-refresh-token");
@@ -79,29 +80,7 @@ else {
                             </div>
                             <div class="flex justify-between gap-4">
                                 <span>{r.formattedDate}</span>
-                                <span class="flex gap-0">
-                                    <span>
-                                        {Math.floor(r.time / 100 / 60) % 60 < 10
-                                            ? "0" +
-                                              (Math.floor(r.time / 100 / 60) %
-                                                  60)
-                                            : Math.floor(r.time / 100 / 60) %
-                                              60}
-                                    </span>
-                                    <span>:</span>
-                                    <span>
-                                        {Math.floor(r.time / 100) % 60 < 10
-                                            ? "0" +
-                                              (Math.floor(r.time / 100) % 60)
-                                            : Math.floor(r.time / 100) % 60}
-                                    </span>
-                                    <span>:</span>
-                                    <span>
-                                        {Math.floor(r.time) % 100 < 10
-                                            ? "0" + (Math.floor(r.time) % 100)
-                                            : Math.floor(r.time) % 100}
-                                    </span>
-                                </span>
+                                <Timer time={r.time} />
                             </div>
                         </div>
                     ))}
