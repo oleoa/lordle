@@ -14,6 +14,12 @@ export default function Message(props) {
         clearInterval(interval);
       }, 2000);
     }
+    if (props.message[1] == "info") {
+      interval = setInterval(() => {
+        props.setMessage({ text: "", type: "" });
+        clearInterval(interval);
+      }, 4000);
+    }
     return () => {
       clearInterval(interval);
     };

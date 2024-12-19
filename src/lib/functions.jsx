@@ -3,6 +3,13 @@ import AllAvaiableWords from "../assets/words.json";
 
 import KeyboardStatus from "../assets/keyboard.json";
 
+export const arraysEqual = (arr1, arr2) => {
+  return (
+    arr1.length === arr2.length &&
+    arr1.every((val, index) => val === arr2[index])
+  );
+};
+
 export const formatTime = (time) => {
   // Get the true values
   const trueCentiSeconds = time;
@@ -71,7 +78,13 @@ export const getLastUserRecord = async () => {
   return Math.min(...times);
 };
 
-export const setNewUserRecord = async (lastWonInCs, rows, letters, answer) => {
+export const setNewUserRecord = async (
+  lastWonInCs,
+  rows,
+  letters,
+  answer,
+  attempts,
+) => {
   const response = await fetch("/api/records", {
     method: "POST",
     headers: {
@@ -82,8 +95,67 @@ export const setNewUserRecord = async (lastWonInCs, rows, letters, answer) => {
       rows: rows,
       letters: letters,
       answer: answer,
-      attemps: null,
+      attempts: attempts,
     }),
   });
   return response;
+};
+
+export const setNewTypedMapPressedKey = (
+  typedMap,
+  currentRow,
+  currentLetter,
+  typed,
+) => {
+  const nextTypedMap = typedMap.map((rowsOnTypedMap, currentRowOnMap) => {
+    if (currentRowOnMap != currentRow) return rowsOnTypedMap;
+    const newRow = rowsOnTypedMap.map((letter, index) => {
+      if (index != currentLetter) return letter;
+      return {
+        typed: typed.toUpperCase(),
+        status: "",
+      };
+    });
+    return newRow;
+  });
+  return nextTypedMap;
+};
+
+export const setNewTypedMapDeleteKey = (
+  typedMap,
+  currentRow,
+  currentLetter,
+) => {
+  const nextTypedMap = typedMap.map((rowsOnTypedMap, currentRowOnMap) => {
+    if (currentRowOnMap != currentRow) return rowsOnTypedMap;
+    const newRow = rowsOnTypedMap.map((letter, index) => {
+      if (index != currentLetter - 1) return letter;
+      return {
+        typed: "",
+        status: "",
+      };
+    });
+    return newRow;
+  });
+  return nextTypedMap;
+};
+
+export const setNewTypedMapStatus = (
+  typedMap,
+  currentRow,
+  currentLetter,
+  status,
+) => {
+  const nextTypedMap = typedMap.map((rowsOnTypedMap, currentRowOnMap) => {
+    if (currentRowOnMap != currentRow) return rowsOnTypedMap;
+    const newRow = rowsOnTypedMap.map((letter, index) => {
+      if (index != currentLetter) return letter;
+      return {
+        ...letter,
+        status: status,
+      };
+    });
+    return newRow;
+  });
+  return nextTypedMap;
 };

@@ -24,6 +24,7 @@ export const POST: APIRoute = async ({ request }) => {
     const rows = body.rows;
     const letters = body.letters;
     const answer = body.answer;
+    const attempts = body.attempts;
 
     const { data, error } = await supabase
       .from("personal-records")
@@ -33,7 +34,7 @@ export const POST: APIRoute = async ({ request }) => {
           rows: rows,
           letters: letters,
           answer: answer,
-          attempts: null,
+          attempts: attempts,
           user_id: user.id,
         },
       ])

@@ -1,46 +1,38 @@
 import { useEffect, useState, useRef } from "react";
-import LetterSquare from "./LetterSquare";
+
+import VirtualKeyboard from "./VirtualKeyboard";
+import TypedMap from "./TypedMap";
+
+import {
+  getCleanVirtualKeyboard,
+  setNewTypedMapPressedKey,
+  setNewTypedMapDeleteKey,
+  setNewTypedMapStatus,
+  arraysEqual,
+} from "../../lib/functions";
+
 import alphabet from "../../assets/alphabet.json";
 
 export default function Game(props) {
-  // Indicates the rules the game will be played with
-  const answer = props.answer;
-  const rows = props.rows;
-  const letters = props.letters;
+  const isFirstRender = useRef(true); // Track for the click to know if it is the first render
+  const [currentRow, setCurrentRow] = useState(0); // Indicates what row is the player in
+  const [cl, setCurrentLetter] = useState(0); // Indicates what letter is the player typing
+  const [virtualKeyboard, setVirtualKeyboard] = useState(
+    getCleanVirtualKeyboard(),
+  ); // The virtual keyboard
 
-  // Indicates where the user is typing
-  const [currentRow, setCurrentRow] = useState(0);
-  const [currentLetter, setCurrentLetter] = useState(0);
-
-  // Creates the spaces for the letters and colors to be filled
-  const [colors, setColors] = useState(Array(rows).fill([]));
-
-  // Functions to set and unset a specific key when typing
-  const [keys, setKeys] = useState(Array(rows).fill([]));
-  const setKey = (row, letter, value) => {
-    let newKeys = JSON.parse(JSON.stringify(keys));
-    newKeys[row][letter] = value;
-    setKeys(newKeys);
-  };
-  const unsetKey = (row, letter) => {
-    let newKeys = JSON.parse(JSON.stringify(keys));
-    newKeys[row].splice([letter], 1);
-    setKeys(newKeys);
-  };
-
-  // Check if the game has restarted
-  useEffect(() => {
-    setKeys(Array(rows).fill([]));
-    setColors(Array(rows).fill([]));
-    setCurrentRow(0);
-    setCurrentLetter(0);
-  }, [props.round]);
+  const [typedMap, setTypedMap] = useState(
+    Array(props.rows).fill(
+      Array(props.letters).fill({
+        typed: "", // The letter
+        status: "", // ["no", "init", "correct"]
+      }),
+    ),
+  ); // The map of the typed letters
 
   // Tracks the users keyboard while in game
-  const isFirstRender = useRef(true);
   useEffect(() => {
     if (isFirstRender.current) {
-      // Skip the first run
       isFirstRender.current = false;
       return;
     }
@@ -50,67 +42,99 @@ export default function Game(props) {
     if (!avaiableKeys.includes(props.click)) return;
 
     if (props.click == "Enter") {
-      // Get the written word in an array
-      const writtenWord = keys[currentRow];
+      // Get the written word and the answer in array
+      const writtenWordArray = typedMap[currentRow].map((ww) => ww.typed);
+      const answerArray = props.answer.split("");
 
       // If the written word is shorter than the whole length returns
-      if (writtenWord.length < props.letters) {
+      if (writtenWordArray.filter((wwa) => wwa).length < props.letters) {
         props.setMessage(["Not full length", "alert"]);
         return;
       }
 
       // Checks if the word is a word
-      if (!props.avaiableWords.includes(writtenWord.join(""))) {
+      if (!props.avaiableWords.includes(writtenWordArray.join(""))) {
         props.setMessage(["That is not a word", "alert"]);
         return;
       }
 
-      // Checks if there is any compatibility and colors it
-      let answerArray = answer.split("");
-      let newColor = colors.map((rowArr) => [...rowArr]);
-      let newKeyboard = { ...props.virtualKeyboard };
-      let tempChosenVerify = [...answerArray];
-      let tempWrittenVerify = [...writtenWord];
-      for (let i = 0; i < tempWrittenVerify.length; i++) {
-        if (tempWrittenVerify[i] == tempChosenVerify[i]) {
-          newKeyboard[tempWrittenVerify[i]].state = "200";
-          tempChosenVerify[i] = "";
-          tempWrittenVerify[i] = "";
-          newColor[currentRow][i] = "green";
+      let tempAnswerVerify = [...answerArray];
+      let tempGuessVerify = [...writtenWordArray];
+      let newTypedMap = [...typedMap];
+
+      for (let cl = 0; cl < props.letters; cl++) {
+        if (tempAnswerVerify[cl] == tempGuessVerify[cl]) {
+          newTypedMap = setNewTypedMapStatus(
+            newTypedMap,
+            currentRow,
+            cl,
+            "correct",
+          );
+          const currentLetterBeingAnalised = tempGuessVerify[cl];
+          setVirtualKeyboard((vk) => {
+            return {
+              ...vk,
+              [currentLetterBeingAnalised]: {
+                ...vk[currentLetterBeingAnalised],
+                state: 200,
+              },
+            };
+          });
+          tempAnswerVerify[cl] = "";
+          tempGuessVerify[cl] = "";
         }
       }
-      for (let i = 0; i < writtenWord.length; i++) {
+      for (let cl = 0; cl < props.letters; cl++) {
         if (
-          tempWrittenVerify[i] &&
-          tempChosenVerify.includes(tempWrittenVerify[i])
+          tempGuessVerify[cl] &&
+          tempAnswerVerify.includes(tempGuessVerify[cl])
         ) {
-          if (newKeyboard[tempWrittenVerify[i]].state != "200")
-            newKeyboard[tempWrittenVerify[i]].state = "100";
-          tempChosenVerify[tempChosenVerify.indexOf(tempWrittenVerify[i])] = "";
-          tempWrittenVerify[i] = "";
-          newColor[currentRow][i] = "yellow";
+          newTypedMap = setNewTypedMapStatus(
+            newTypedMap,
+            currentRow,
+            cl,
+            "init",
+          );
+          const currentLetterBeingAnalised = tempGuessVerify[cl];
+          setVirtualKeyboard((vk) => {
+            if (vk[currentLetterBeingAnalised].state != 0) return vk;
+            return {
+              ...vk,
+              [currentLetterBeingAnalised]: {
+                ...vk[currentLetterBeingAnalised],
+                state: 100,
+              },
+            };
+          });
+          tempAnswerVerify[tempAnswerVerify.indexOf(tempGuessVerify[cl])] = "";
+          tempGuessVerify[cl] = "";
         }
       }
-      for (let i = 0; i < writtenWord.length; i++) {
-        if (tempWrittenVerify[i]) {
-          if (
-            newKeyboard[tempWrittenVerify[i]].state != "200" &&
-            newKeyboard[tempWrittenVerify[i]].state != "100"
-          )
-            newKeyboard[tempWrittenVerify[i]].state = "404";
-          newColor[currentRow][i] = "gray";
+      for (let cl = 0; cl < props.letters; cl++) {
+        if (tempGuessVerify[cl]) {
+          newTypedMap = setNewTypedMapStatus(newTypedMap, currentRow, cl, "no");
+          const currentLetterBeingAnalised = tempGuessVerify[cl];
+          setVirtualKeyboard((vk) => {
+            if (vk[currentLetterBeingAnalised].state != 0) return vk;
+            return {
+              ...vk,
+              [currentLetterBeingAnalised]: {
+                ...vk[currentLetterBeingAnalised],
+                state: 404,
+              },
+            };
+          });
         }
       }
-      setColors(newColor);
-      props.setVirtualKeyboard(newKeyboard);
+      setTypedMap(newTypedMap);
 
       // Checks if the written word is equal to the chosen one
-      if (writtenWord.every((value, index) => value === answerArray[index])) {
+      if (arraysEqual(writtenWordArray, answerArray)) {
         props.setGameStatus("won");
         return;
       } else {
         // If it is not it checks if the user lost
-        if (currentRow >= rows - 1) {
+        if (currentRow >= props.rows - 1) {
           props.setGameStatus("lost");
           return;
         }
@@ -123,80 +147,53 @@ export default function Game(props) {
     }
 
     // Takes the player back to the menu
-    if (props.click == "Escape") {
-      props.setGameStatus("menu");
-      return;
-    }
+    if (props.click == "Escape") props.setGameStatus("menu");
 
     // Deletes one character
     if (props.click == "Backspace") {
-      if (currentLetter == 0) return;
-      unsetKey(currentRow, currentLetter - 1);
-      setCurrentLetter((prevLetter) => prevLetter - 1);
+      if (cl == 0) return;
+      setTypedMap(setNewTypedMapDeleteKey(typedMap, currentRow, cl));
+      setCurrentLetter((cl) => cl - 1);
       return;
     }
 
     // Add a new letter
     if (alphabet.includes(props.click)) {
-      if (currentLetter > props.letters - 1) return;
-      const pressedKey = props.click.toUpperCase();
-      setKey(currentRow, currentLetter, pressedKey);
-      setCurrentLetter((prevLetter) => prevLetter + 1);
+      if (cl > props.letters - 1) return;
+      setTypedMap(
+        setNewTypedMapPressedKey(typedMap, currentRow, cl, props.click),
+      );
+      setCurrentLetter((cl) => cl + 1);
+      return;
     }
   }, [props.clickObserver]);
 
-  // Creates the components
-  let lettersSquares = [];
-  for (let i = 0; i < rows; i++) {
-    lettersSquares[i] = [];
-    for (let n = 0; n < letters; n++) {
-      lettersSquares[i][n] = (
-        <LetterSquare
-          letter={keys[i][n]}
-          color={colors[i][n]}
-          key={i + "" + n}
-        />
+  // Tracks if the game has restarted and cleans up the old stats
+  useEffect(() => {
+    if (props.gameStatus == "ready") {
+      setCurrentRow(0);
+      setCurrentLetter(0);
+      setTypedMap(
+        Array(props.rows).fill(
+          Array(props.letters).fill({
+            typed: "", // The letter
+            status: "", // ["no", "init", "correct"]
+          }),
+        ),
       );
+      setVirtualKeyboard(getCleanVirtualKeyboard());
     }
-  }
-
-  // Divide the lettersSquares into two differents arrays
-  let midIndex = Math.ceil(lettersSquares.length / 2);
-  let firstLettersSquaresHalf = lettersSquares.slice(0, midIndex);
-  let secondLettersSquaresHalf = lettersSquares.slice(midIndex);
+    if (props.gameStatus == "won") {
+      if (!props.isLoggedIn)
+        props.setMessage(["Log in to save the records", "info"]);
+      else props.setAttempts(typedMap);
+    }
+  }, [props.gameStatus]);
 
   return (
-    <div className="flex items-center justify-center gap-12 w-full">
-      {rows < 8 && (
-        <div
-          className="grid gap-4"
-          style={{
-            gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
-          }}
-        >
-          {lettersSquares}
-        </div>
-      )}
-      {rows >= 8 && (
-        <>
-          <div
-            className="grid gap-4"
-            style={{
-              gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
-            }}
-          >
-            {firstLettersSquaresHalf}
-          </div>
-          <div
-            className="grid gap-4"
-            style={{
-              gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
-            }}
-          >
-            {secondLettersSquaresHalf}
-          </div>
-        </>
-      )}
+    <div className="flex flex-col items-center justify-center gap-12 w-full">
+      <TypedMap typedMap={typedMap} />
+      <VirtualKeyboard virtualKeyboard={virtualKeyboard} />
     </div>
   );
 }

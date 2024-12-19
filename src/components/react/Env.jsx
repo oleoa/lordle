@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import {
   createNewRandomAnswer,
   createNewAvaiableGuesses,
-  getCleanVirtualKeyboard,
   getLastUserRecord,
   setNewUserRecord,
 } from "../../lib/functions.jsx";
@@ -12,7 +11,6 @@ import Game from "./Game";
 import Minimap from "./Minimap";
 import Menu from "./Menu";
 import Shortcuts from "./Shortcuts";
-import VirtualKeyboard from "./VirtualKeyboard";
 import Clock from "./Clock";
 import Message from "./Message";
 
@@ -26,23 +24,18 @@ export default function Env(props) {
   const [haveCountdown, setHaveCountdown] = useState(false); // If the game will have a countdown
   const [countdown, setCountdown] = useState(60); // How long is the countdown
   const [message, setMessage] = useState(["", ""]); // The message that appears on the bottom of the screen
-  const [round, setRound] = useState(0); // The round the game is (used for observer)
   const [gameStatus, setGameStatus] = useState("menu"); // The current game status ["menu", "ready", "won", "lost"]
   const [clickObserver, setClickObserver] = useState(0); // How many times the player clicked on any key (used for observer)
   const [click, setClick] = useState(); // The last key the player pressed
-  const [lastRecord, setLastRecord] = useState(); // The last record in time of the current player
+  const [lastRecord, setLastRecord] = useState(null); // The last record in time of the current player
   const [lastWonInCs, setLastWonInCs] = useState(0); // The time it took for player to win the last game
-  const [virtualKeyboard, setVirtualKeyboard] = useState(
-    getCleanVirtualKeyboard(),
-  ); // The keyboard that appears on the game
+  const [attempts, setAttempts] = useState(null); // The map of the typed letters used for the records
 
   // Function that gets the environment ready for a new round
   const newRound = () => {
     setGameStatus("ready");
     setAnswer(createNewRandomAnswer(letters));
     setAvaiableWords(createNewAvaiableGuesses(letters));
-    setVirtualKeyboard(getCleanVirtualKeyboard());
-    setRound((prevRound) => prevRound + 1);
   };
 
   // Track the keyboard click
@@ -67,13 +60,17 @@ export default function Env(props) {
             ? props.rules.lettersMinLimit
             : l - 1,
         );
-      else if (event.key == "ArrowDown")
+      else if (event.key == "ArrowDown") {
         setRows((r) =>
-          r >= props.rules.rowsMaxLimit ? props.rules.rowsMaxLimit : r + 1,
+          r >= parseInt(props.rules.rowsMaxLimit)
+            ? parseInt(props.rules.rowsMaxLimit)
+            : r + 1,
         );
-      else if (event.key == "ArrowUp")
+      } else if (event.key == "ArrowUp")
         setRows((r) =>
-          r <= props.rules.rowsMinLimit ? props.rules.rowsMinLimit : r - 1,
+          r <= parseInt(props.rules.rowsMinLimit)
+            ? parseInt(props.rules.rowsMinLimit)
+            : r - 1,
         );
       else if (event.key == "t") {
         if (haveTimer) {
@@ -113,6 +110,7 @@ export default function Env(props) {
 
   // Tracks for the user's record
   useEffect(() => {
+    if (!props.isLoggedIn) return;
     const asyncFetchUserRecord = async () => {
       try {
         const lr = await getLastUserRecord();
@@ -122,11 +120,17 @@ export default function Env(props) {
       }
     };
     asyncFetchUserRecord();
-
     if (lastWonInCs && lastWonInCs < lastRecord) {
       setMessage(["New Record!", "congrats"]);
       setLastWonInCs(lastWonInCs);
-      setNewUserRecord(lastWonInCs, rows, letters, answer);
+      const asyncSetNewRecord = async () => {
+        try {
+          await setNewUserRecord(lastWonInCs, rows, letters, answer, attempts);
+        } catch (error) {
+          console.error("Failed to set a new record:", error);
+        }
+      };
+      asyncSetNewRecord();
     }
   }, [lastWonInCs]);
 
@@ -159,15 +163,13 @@ export default function Env(props) {
             gameStatus={gameStatus}
             setGameStatus={setGameStatus}
             setMessage={setMessage}
-            round={round}
             click={click}
             clickObserver={clickObserver}
-            virtualKeyboard={virtualKeyboard}
-            setVirtualKeyboard={setVirtualKeyboard}
+            isLoggedIn={props.isLoggedIn}
+            setAttempts={setAttempts}
           />
-          <VirtualKeyboard virtualKeyboard={virtualKeyboard} />
           <Clock
-            setLastCs={setLastCs}
+            setLastWonInCs={setLastWonInCs}
             haveTimer={haveTimer}
             haveCountdown={haveCountdown}
             countdown={countdown}

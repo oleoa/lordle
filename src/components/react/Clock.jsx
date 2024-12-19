@@ -19,7 +19,7 @@ export default function Clock(props) {
       timer = setInterval(() => setCs((cs) => cs + 1), 10);
     }
     if (props.gameStatus == "won") {
-      props.setLastCs(cs);
+      props.setLastWonInCs(cs);
     }
     return () => {
       clearInterval(timer);

@@ -1,6 +1,8 @@
 ---
 import Layout from "../layouts/Layout.astro";
 
+import { supabase } from "../lib/supabase.ts";
+
 import Env from "../components/react/Env";
 
 const rowsMinLimit = import.meta.env.rowsMinLimit;
@@ -9,6 +11,10 @@ const lettersMinLimit = import.meta.env.lettersMinLimit;
 const lettersMaxLimit = import.meta.env.lettersMaxLimit;
 const countdownMinLimit = import.meta.env.countdownMinLimit;
 const countdownMaxLimit = import.meta.env.countdownMaxLimit;
+
+const {
+    data: { user },
+} = await supabase.auth.getUser();
 ---
 
 <Layout padding={false}>
@@ -23,6 +29,7 @@ const countdownMaxLimit = import.meta.env.countdownMaxLimit;
                 countdownMinLimit: countdownMinLimit,
                 countdownMaxLimit: countdownMaxLimit,
             }}
+            isLoggedIn={user != null}
         />
     </div>
 </Layout>
