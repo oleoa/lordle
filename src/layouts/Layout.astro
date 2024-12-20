@@ -14,10 +14,7 @@ const { title, padding = true } = Astro.props;
         <meta name="generator" content={Astro.generator} />
         <title>{title || "Wordly"}</title>
     </head>
-    <body
-        class={"text-white bg-cover bg-center " + (padding && "pt-24")}
-        style={"background-image: url(" + Background.src + ");"}
-    >
+    <body class={"text-white bg " + (padding && "pt-24")}>
         <Navbar />
         <slot />
     </body>

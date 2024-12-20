@@ -3,8 +3,8 @@ import { useEffect } from "react";
 export default function Message(props) {
   let bgColor = "";
   if (props.message[1] == "alert") bgColor = "bg-red-500";
-  if (props.message[1] == "info") bgColor = "bg-blue-500";
-  if (props.message[1] == "congrats") bgColor = "bg-yellow-500";
+  if (props.message[1] == "info") bgColor = "bg-blue";
+  if (props.message[1] == "congrats") bgColor = "bg-yellow";
 
   useEffect(() => {
     let interval;

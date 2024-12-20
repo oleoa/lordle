@@ -178,7 +178,7 @@ export const setNewTypedMapAndVirtualKeyboardFromWrittenWord = (
     if (tempGuessVerify[cl]) {
       newTypedMap = setNewTypedMapStatus(newTypedMap, currentRow, cl, "no");
       if (
-        newVirtualKeyboard[tempGuessVerify[cl]].state != 200 ||
+        newVirtualKeyboard[tempGuessVerify[cl]].state != 200 &&
         newVirtualKeyboard[tempGuessVerify[cl]].state != 100
       ) {
         newVirtualKeyboard = {

@@ -2,9 +2,9 @@ import { useEffect, useRef, useState } from "react";
 
 export default function Letter(props) {
   let color;
-  if (props.status == "no") color = "rgba(125, 132, 145)";
-  if (props.status == "init") color = "rgba(255, 200, 87)";
-  if (props.status == "correct") color = "rgba(77, 170, 87)";
+  if (props.status == "no") color = "bg-gray";
+  if (props.status == "init") color = "bg-yellow";
+  if (props.status == "correct") color = "bg-green";
 
   const [animationKey, setAnimationKey] = useState(0);
   const [animate, setAnimate] = useState(false);
@@ -25,9 +25,10 @@ export default function Letter(props) {
       key={animationKey}
       className={
         "w-16 h-16 border-2 border-white rounded-lg flex items-center justify-center bg-blur " +
+        color +
+        " " +
         (animate && "giggle")
       }
-      style={{ backgroundColor: color }}
     >
       <p className="text-xl font-bold">{props.letter}</p>
     </div>
