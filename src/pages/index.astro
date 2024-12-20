@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 
 import { supabase } from "../lib/supabase.ts";
 
-import Env from "../components/react/Env";
+import Root from "../components/react/Root";
 
 const rowsMinLimit = import.meta.env.rowsMinLimit;
 const rowsMaxLimit = import.meta.env.rowsMaxLimit;
@@ -19,7 +19,7 @@ const {
 
 <Layout padding={false}>
     <div class="p-4 flex flex-col items-center justify-center gap-12 h-full">
-        <Env
+        <Root
             client:load
             rules={{
                 rowsMinLimit: rowsMinLimit,

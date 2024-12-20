@@ -125,3 +125,71 @@ export const setNewTypedMapStatus = (
   });
   return nextTypedMap;
 };
+
+export const setNewTypedMapAndVirtualKeyboardFromWrittenWord = (
+  letters,
+  currentRow,
+  answerArray,
+  writtenWordArray,
+  typedMap,
+  virtualKeyboard,
+) => {
+  let tempAnswerVerify = [...answerArray];
+  let tempGuessVerify = [...writtenWordArray];
+  let newTypedMap = [...typedMap];
+  let newVirtualKeyboard = { ...virtualKeyboard };
+
+  for (let cl = 0; cl < letters; cl++) {
+    if (tempAnswerVerify[cl] == tempGuessVerify[cl]) {
+      newTypedMap = setNewTypedMapStatus(
+        newTypedMap,
+        currentRow,
+        cl,
+        "correct",
+      );
+      newVirtualKeyboard = {
+        ...newVirtualKeyboard,
+        [tempGuessVerify[cl]]: {
+          ...newVirtualKeyboard[tempGuessVerify[cl]],
+          state: 200,
+        },
+      };
+      tempAnswerVerify[cl] = "";
+      tempGuessVerify[cl] = "";
+    }
+  }
+  for (let cl = 0; cl < letters; cl++) {
+    if (tempGuessVerify[cl] && tempAnswerVerify.includes(tempGuessVerify[cl])) {
+      newTypedMap = setNewTypedMapStatus(newTypedMap, currentRow, cl, "init");
+      if (newVirtualKeyboard[tempGuessVerify[cl]].state != 200) {
+        newVirtualKeyboard = {
+          ...newVirtualKeyboard,
+          [tempGuessVerify[cl]]: {
+            ...newVirtualKeyboard[tempGuessVerify[cl]],
+            state: 100,
+          },
+        };
+      }
+      tempAnswerVerify[tempAnswerVerify.indexOf(tempGuessVerify[cl])] = "";
+      tempGuessVerify[cl] = "";
+    }
+  }
+  for (let cl = 0; cl < letters; cl++) {
+    if (tempGuessVerify[cl]) {
+      newTypedMap = setNewTypedMapStatus(newTypedMap, currentRow, cl, "no");
+      if (
+        newVirtualKeyboard[tempGuessVerify[cl]].state != 200 ||
+        newVirtualKeyboard[tempGuessVerify[cl]].state != 100
+      ) {
+        newVirtualKeyboard = {
+          ...newVirtualKeyboard,
+          [tempGuessVerify[cl]]: {
+            ...newVirtualKeyboard[tempGuessVerify[cl]],
+            state: 404,
+          },
+        };
+      }
+    }
+  }
+  return [newTypedMap, newVirtualKeyboard];
+};
