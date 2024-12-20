@@ -70,15 +70,21 @@ export default function Menu(props) {
 
   // Handles the click for the menu
   useEffect(() => {
-    if (props.click == "Enter") startGame();
-    else if (props.click == "ArrowRight") moreLetters();
-    else if (props.click == "ArrowLeft") lessLetters();
-    else if (props.click == "ArrowDown") moreRows();
-    else if (props.click == "ArrowUp") lessRows();
-    else if (props.click == "c") toggleClock();
-    else if (props.click == "+" || props.click == "=") moreCountdown();
-    else if (props.click == "-") lessCountdown();
-  }, [props.clickObserver]);
+    if (props.click.typed == "Enter") startGame();
+    else if (props.click.typed == "ArrowRight") moreLetters();
+    else if (props.click.typed == "ArrowLeft") lessLetters();
+    else if (props.click.typed == "ArrowDown") moreRows();
+    else if (props.click.typed == "ArrowUp") lessRows();
+    else if (props.click.typed == "c") toggleClock();
+    else if (props.click.typed == "+" || props.click.typed == "=")
+      moreCountdown();
+    else if (props.click.typed == "-") lessCountdown();
+
+    // Deletes the last typed key for safity reasons but don't alert the observer
+    props.setClick((c) => {
+      return { typed: "", observer: c.observer };
+    });
+  }, [props.click.observer]);
 
   return (
     <div className="flex flex-col items-start justify-center gap-4 h-full">

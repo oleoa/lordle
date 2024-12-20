@@ -21,13 +21,11 @@ import {
 import alphabet from "../../assets/alphabet.json";
 
 export default function Game(props) {
-  const isFirstRender = useRef(true); // Track for the click to know if it is the first render
-
   const [avaiableWords, setAvaiableWords] = useState([]); // List of all words the player can guess
   const [answer, setAnswer] = useState(""); // The only correct answer
 
   const [currentRow, setCurrentRow] = useState(0); // Indicates what row is the player in
-  const [cl, setCurrentLetter] = useState(0); // Indicates what letter is the player typing
+  const [currentLetter, setCurrentLetter] = useState(0); // Indicates what letter is the player typing
 
   const [lastRecord, setLastRecord] = useState(null); // The last record in time of the current player
   const [lastWonInCs, setLastWonInCs] = useState(0); // The time it took for player to win the last game
@@ -54,15 +52,20 @@ export default function Game(props) {
   const returnMenu = () => {
     props.setGameStatus("menu");
   };
+  const playAgain = () => {
+    props.setGameStatus("ready");
+  };
   const backspace = () => {
-    if (cl == 0) return;
-    setTypedMap(setNewTypedMapDeleteKey(typedMap, currentRow, cl));
+    if (currentLetter == 0) return;
+    setTypedMap(setNewTypedMapDeleteKey(typedMap, currentRow, currentLetter));
     setCurrentLetter((cl) => cl - 1);
     return;
   };
   const addLetter = (letter) => {
-    if (cl > props.letters - 1) return;
-    setTypedMap(setNewTypedMapPressedKey(typedMap, currentRow, cl, letter));
+    if (currentLetter > props.letters - 1) return;
+    setTypedMap(
+      setNewTypedMapPressedKey(typedMap, currentRow, currentLetter, letter),
+    );
     setCurrentLetter((cl) => cl + 1);
     return;
   };
@@ -100,7 +103,7 @@ export default function Game(props) {
     if (arraysEqual(writtenWordArray, answerArray)) {
       props.setGameStatus("won");
       if (!props.isLoggedIn) setMessage(["Log in to save the records", "info"]);
-      else setAttempts(typedMap);
+      else setAttempts(newTypedMap);
     } else {
       // If it is not it checks if the user lost
       if (currentRow >= props.rows - 1) {
@@ -115,38 +118,25 @@ export default function Game(props) {
     }
   };
 
-  const userActions = {
-    backspace,
-    addLetter,
-    enterClick,
-  };
-
   // Tracks the users keyboard while in game
   useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
     const avaiableKeys = [...alphabet];
     avaiableKeys.push(...["Enter", "Backspace", "Escape", "/"]);
-    if (!avaiableKeys.includes(props.click)) return;
+    if (!avaiableKeys.includes(props.click.typed)) {
+      props.setClick({ typed: "", observer: 0 });
+      return;
+    }
+    if (props.click.typed == "Enter") enterClick();
+    if (props.click.typed == "Escape") returnMenu();
+    if (props.click.typed == "/") giveUp();
+    if (props.click.typed == "Backspace") backspace();
+    if (alphabet.includes(props.click.typed)) addLetter(props.click.typed);
 
-    // Checks if is full length, is a word, any close and corrects
-    if (props.click == "Enter") enterClick();
-
-    // Takes the player back to the menu
-    if (props.click == "Escape") returnMenu();
-
-    // Resets the game
-    if (props.click == "/") giveUp();
-
-    // Deletes a letter
-    if (props.click == "Backspace") backspace();
-
-    // Add a new letter
-    if (alphabet.includes(props.click)) addLetter(props.click);
-  }, [props.clickObserver]);
+    // Deletes the last typed key for safity reasons but don't alert the observer
+    props.setClick((c) => {
+      return { typed: "", observer: c.observer };
+    });
+  }, [props.click.observer]);
 
   // Tracks if the game has restarted and cleans up the old stats
   useEffect(() => {
@@ -206,6 +196,7 @@ export default function Game(props) {
         actions={{
           giveUp,
           returnMenu,
+          playAgain,
         }}
         lastRecord={lastRecord}
         gameStatus={props.gameStatus}

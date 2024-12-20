@@ -14,21 +14,28 @@ export default function Root(props) {
   const [gameStatus, setGameStatus] = useState("menu"); // The current game status ["menu", "ready", "won", "lost"]
   const [showGame, setShowGame] = useState(false); // If the game should mount
 
-  const [menuClickObserver, setMenuClickObserver] = useState(0); // Observer for the menu click
-  const [gameClickObserver, setGameClickObserver] = useState(0); // Observer for the game click
-  const [click, setClick] = useState(); // The last key the player pressed
+  const [menuClick, setMenuClick] = useState({ typed: "", observer: 0 }); // Tracks the clicks sent to the menu
+  const [gameClick, setGameClick] = useState({ typed: "", observer: 0 }); // Tracks the clicks sent to the game
 
   // Handle the keyboard click
   const handleKeydown = (event) => {
-    setClick(event.key);
-
     if (gameStatus == "ready") {
-      setGameClickObserver((prevClickId) => prevClickId + 1);
+      setGameClick((c) => {
+        return {
+          typed: event.key,
+          observer: c.observer + 1,
+        };
+      });
       return;
     }
 
     if (gameStatus == "menu") {
-      setMenuClickObserver((prevClickId) => prevClickId + 1);
+      setMenuClick((c) => {
+        return {
+          typed: event.key,
+          observer: c.observer + 1,
+        };
+      });
       return;
     }
 
@@ -64,8 +71,8 @@ export default function Root(props) {
           setHaveCountdown={setHaveCountdown}
           countdown={countdown}
           setCountdown={setCountdown}
-          click={click}
-          clickObserver={menuClickObserver}
+          click={menuClick}
+          setClick={setMenuClick}
           gameStatus={gameStatus}
           setGameStatus={setGameStatus}
         />
@@ -76,8 +83,8 @@ export default function Root(props) {
           letters={letters}
           gameStatus={gameStatus}
           setGameStatus={setGameStatus}
-          click={click}
-          clickObserver={gameClickObserver}
+          click={gameClick}
+          setClick={setGameClick}
           isLoggedIn={props.isLoggedIn}
           haveTimer={haveTimer}
           haveCountdown={haveCountdown}
