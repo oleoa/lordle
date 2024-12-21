@@ -9,8 +9,8 @@ export default function Menu(props) {
   const moreRows = () => {
     props.setRules((r) => {
       const newRows =
-        r.rows >= parseInt(props.rules.rowsMaxLimit)
-          ? parseInt(props.rules.rowsMaxLimit)
+        r.rows >= parseInt(props.env.rowsMaxLimit)
+          ? parseInt(props.env.rowsMaxLimit)
           : r.rows + 1;
       return {
         ...r,
@@ -21,8 +21,8 @@ export default function Menu(props) {
   const lessRows = () => {
     props.setRules((r) => {
       const newRows =
-        r.rows <= parseInt(props.rules.rowsMinLimit)
-          ? parseInt(props.rules.rowsMinLimit)
+        r.rows <= parseInt(props.env.rowsMinLimit)
+          ? parseInt(props.env.rowsMinLimit)
           : r.rows - 1;
       return {
         ...r,
@@ -33,8 +33,8 @@ export default function Menu(props) {
   const moreLetters = () => {
     props.setRules((r) => {
       const newLetters =
-        r.letters >= parseInt(props.rules.lettersMaxLimit)
-          ? parseInt(props.rules.lettersMaxLimit)
+        r.letters >= parseInt(props.env.lettersMaxLimit)
+          ? parseInt(props.env.lettersMaxLimit)
           : r.letters + 1;
       return {
         ...r,
@@ -45,8 +45,8 @@ export default function Menu(props) {
   const lessLetters = () => {
     props.setRules((r) => {
       const newLetters =
-        r.letters <= parseInt(props.rules.lettersMinLimit)
-          ? parseInt(props.rules.lettersMinLimit)
+        r.letters <= parseInt(props.env.lettersMinLimit)
+          ? parseInt(props.env.lettersMinLimit)
           : r.letters - 1;
       return {
         ...r,
@@ -90,20 +90,28 @@ export default function Menu(props) {
     }
   };
   const moreCountdown = () => {
-    props.haveCountdown &&
-      props.setCountdown((cd) =>
-        cd >= parseInt(props.rules.countdownMaxLimit)
-          ? parseInt(props.rules.countdownMaxLimit)
-          : cd + 10,
-      );
+    props.rules.haveCountdown &&
+      props.setRules((r) => {
+        return {
+          ...r,
+          countdown:
+            r.countdown >= parseInt(props.env.countdownMaxLimit)
+              ? parseInt(props.env.countdownMaxLimit)
+              : r.countdown + 10,
+        };
+      });
   };
   const lessCountdown = () => {
-    props.haveCountdown &&
-      props.setCountdown((cd) =>
-        cd <= parseInt(props.rules.countdownMinLimit)
-          ? parseInt(props.rules.countdownMinLimit)
-          : cd - 10,
-      );
+    props.rules.haveCountdown &&
+      props.setRules((r) => {
+        return {
+          ...r,
+          countdown:
+            r.countdown <= parseInt(props.env.countdownMinLimit)
+              ? parseInt(props.env.countdownMinLimit)
+              : r.countdown - 10,
+        };
+      });
   };
   const startGame = () => {
     props.setPage("game");

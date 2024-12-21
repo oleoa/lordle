@@ -30,7 +30,13 @@ export default function VirtualKey(props) {
         " " +
         (animate && " giggle")
       }
-      onClick={() => props.handleClick(props.keyboardKey)}
+      onClick={(e) => {
+        e.target.blur();
+        props.handleClick({
+          typed: props.keyboardKey,
+          address: "game",
+        });
+      }}
     >
       {props.keyboardKey}
     </button>

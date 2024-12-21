@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 import VirtualKeyboard from "./VirtualKeyboard";
 import TypedMap from "./TypedMap";
@@ -11,7 +11,7 @@ import {
   getCleanVirtualKeyboard,
   setNewTypedMapPressedKey,
   setNewTypedMapDeleteKey,
-  getLastUserRecord,
+  getBestUserRecord,
   setNewUserRecord,
   createNewRandomAnswer,
   createNewAvaiableGuesses,
@@ -23,6 +23,8 @@ import alphabet from "../../assets/alphabet.json";
 export default function Game(props) {
   const [status, setStatus] = useState("loading"); // ["loading", "ready", "playing", "won", "lost"]
   const [message, setMessage] = useState(["", ""]); // The message that appears on the bottom of the screen, ["alert", "info", "congrats"]
+  const [bestRecord, setBestRecord] = useState(null); // The best record in time of the current player
+  const [lastWinTime, setLastWinTime] = useState(0); // The time it took for player to win the last game
   const [words, setWords] = useState({
     avaiable: [],
     answer: "",
@@ -42,10 +44,6 @@ export default function Game(props) {
       }),
     ),
   ); // The map of the typed letters
-
-  const [lastRecord, setLastRecord] = useState(null); // The last record in time of the current player
-  const [lastWonInCs, setLastWonInCs] = useState(0); // The time it took for player to win the last game
-  const [attempts, setAttempts] = useState(null); // The map of the typed letters used for the records
 
   const giveUp = () => {
     setStatus("lost");
@@ -115,24 +113,22 @@ export default function Game(props) {
     // Checks if the written word is equal to the chosen one
     if (arraysEqual(writtenWordArray, answerArray)) {
       setStatus("won");
-      if (!props.isLoggedIn) setMessage(["Log in to save the records", "info"]);
-      else setAttempts(newTypedMap);
-    } else {
-      // If it is not it checks if the user lost
-      if (position.row >= props.rules.rows - 1) {
-        setStatus("lost");
-        return;
-      }
-
-      // If the player didn't lose it passes to the next line
-      setPosition((p) => {
-        return {
-          row: p.row + 1,
-          letter: 0,
-        };
-      });
       return;
     }
+
+    // If it is not it checks if the user lost
+    if (position.row >= props.rules.rows - 1) {
+      setStatus("lost");
+      return;
+    }
+
+    // If the player didn't lose nor won it passes to the next line
+    setPosition((p) => {
+      return {
+        row: p.row + 1,
+        letter: 0,
+      };
+    });
   };
 
   const handleClick = (click) => {
@@ -142,7 +138,9 @@ export default function Game(props) {
     if (!authorized.includes(click.typed)) return;
 
     if (status == "loading") return;
+
     if (status == "ready" || status == "playing") {
+      if (status == "ready") setStatus("playing");
       if (click.typed == "Enter") enter();
       if (click.typed == "Escape") returnMenu();
       if (click.typed == "/") giveUp();
@@ -150,6 +148,7 @@ export default function Game(props) {
       if (alphabet.includes(click.typed)) addLetter(click.typed);
       return;
     }
+
     if (status == "won" || status == "lost") {
       if (click.typed == "Enter") playAgain();
       if (click.typed == "Escape") returnMenu();
@@ -183,41 +182,43 @@ export default function Game(props) {
         ),
       );
       setVirtualKeyboard(getCleanVirtualKeyboard());
+      if (props.isLoggedIn) {
+        const asyncFetchUserRecord = async () => {
+          try {
+            const br = await getBestUserRecord();
+            setBestRecord(br);
+          } catch (error) {
+            console.error("Failed to fetch the last user record:", error);
+          }
+        };
+        asyncFetchUserRecord();
+      }
       setStatus("ready");
     }
+    if (status == "won") {
+      if (!props.isLoggedIn) setMessage(["Log in to save the records", "info"]);
+      else {
+        if (lastWinTime && lastWinTime < bestRecord) {
+          setMessage(["New Record!", "congrats"]);
+          setBestRecord(lastWinTime);
+          const asyncSetNewRecord = async () => {
+            try {
+              await setNewUserRecord(
+                lastWinTime,
+                props.rules.rows,
+                props.rules.letters,
+                words.answer,
+                typedMap,
+              );
+            } catch (error) {
+              console.error("Failed to set a new record:", error);
+            }
+          };
+          asyncSetNewRecord();
+        }
+      }
+    }
   }, [status]);
-
-  // Tracks for the user's record
-  // useEffect(() => {
-  //   if (!props.isLoggedIn) return;
-  //   const asyncFetchUserRecord = async () => {
-  //     try {
-  //       const lr = await getLastUserRecord();
-  //       setLastRecord(lr);
-  //     } catch (error) {
-  //       console.error("Failed to fetch the last user record:", error);
-  //     }
-  //   };
-  //   asyncFetchUserRecord();
-  //   if (lastWonInCs && lastWonInCs < lastRecord) {
-  //     setMessage(["New Record!", "congrats"]);
-  //     setLastWonInCs(lastWonInCs);
-  //     const asyncSetNewRecord = async () => {
-  //       try {
-  //         await setNewUserRecord(
-  //           lastWonInCs,
-  //           props.rows,
-  //           props.letters,
-  //           answer,
-  //           attempts,
-  //         );
-  //       } catch (error) {
-  //         console.error("Failed to set a new record:", error);
-  //       }
-  //     };
-  //     asyncSetNewRecord();
-  //   }
-  // }, [lastWonInCs]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-12 w-full">
@@ -228,7 +229,7 @@ export default function Game(props) {
           returnMenu,
           playAgain,
         }}
-        lastRecord={lastRecord}
+        lastRecord={bestRecord}
         gameStatus={status}
         answer={words.answer}
       />
@@ -239,9 +240,9 @@ export default function Game(props) {
       />
       <Clock
         rules={props.rules}
-        setLastWonInCs={setLastWonInCs}
-        gameStatus={props.gameStatus}
-        setGameStatus={props.setGameStatus}
+        setLastWinTime={setLastWinTime}
+        gameStatus={status}
+        setGameStatus={setStatus}
       />
     </div>
   );

@@ -3,7 +3,7 @@ import Timer from "./Timer";
 export default function Shortcuts(props) {
   return (
     <div className="fixed bottom-0 left-0 p-4">
-      {props.gameStatus == "ready" && (
+      {(props.gameStatus == "ready" || props.gameStatus == "playing") && (
         <div className="flex flex-col items-start justify-center gap-4 w-full">
           <button
             className="border-2 px-4 py-2 rounded-lg"

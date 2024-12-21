@@ -35,7 +35,7 @@ export const getCleanVirtualKeyboard = () => {
   return JSON.parse(JSON.stringify(KeyboardStatus));
 };
 
-export const getLastUserRecord = async () => {
+export const getBestUserRecord = async () => {
   const response = await fetch("/api/records");
   const data = await response.json();
   const times = data.map((r) => {
