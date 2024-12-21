@@ -118,24 +118,28 @@ export default function Game(props) {
     }
   };
 
-  // Tracks the users keyboard while in game
-  useEffect(() => {
+  const handleClick = (click) => {
     const avaiableKeys = [...alphabet];
     avaiableKeys.push(...["Enter", "Backspace", "Escape", "/"]);
-    if (!avaiableKeys.includes(props.click.typed)) {
+    if (!avaiableKeys.includes(click)) {
       props.setClick({ typed: "", observer: 0 });
       return;
     }
-    if (props.click.typed == "Enter") enterClick();
-    if (props.click.typed == "Escape") returnMenu();
-    if (props.click.typed == "/") giveUp();
-    if (props.click.typed == "Backspace") backspace();
-    if (alphabet.includes(props.click.typed)) addLetter(props.click.typed);
+    if (click == "Enter") enterClick();
+    if (click == "Escape") returnMenu();
+    if (click == "/") giveUp();
+    if (click == "Backspace") backspace();
+    if (alphabet.includes(click)) addLetter(click);
 
     // Deletes the last typed key for safity reasons but don't alert the observer
     props.setClick((c) => {
       return { typed: "", observer: c.observer };
     });
+  };
+
+  // Tracks the users keyboard while in game
+  useEffect(() => {
+    handleClick(props.click.typed);
   }, [props.click.observer]);
 
   // Tracks if the game has restarted and cleans up the old stats
@@ -203,7 +207,10 @@ export default function Game(props) {
         answer={answer}
       />
       <TypedMap typedMap={typedMap} />
-      <VirtualKeyboard virtualKeyboard={virtualKeyboard} />
+      <VirtualKeyboard
+        virtualKeyboard={virtualKeyboard}
+        handleClick={handleClick}
+      />
       <Clock
         setLastWonInCs={setLastWonInCs}
         haveTimer={props.haveTimer}

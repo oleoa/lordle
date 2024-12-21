@@ -1,106 +1,158 @@
 {
   "A": {
     "letter": "A",
-    "state": "0"
+    "state": "0",
+    "row": "1",
+    "order": "0"
   },
   "B": {
     "letter": "B",
-    "state": "0"
+    "state": "0",
+    "row": "2",
+    "order": "4"
   },
   "C": {
     "letter": "C",
-    "state": "0"
+    "state": "0",
+    "row": "2",
+    "order": "2"
   },
   "D": {
     "letter": "D",
-    "state": "0"
+    "state": "0",
+    "row": "1",
+    "order": "2"
   },
   "E": {
     "letter": "E",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "2"
   },
   "F": {
     "letter": "F",
-    "state": "0"
+    "state": "0",
+    "row": "1",
+    "order": "3"
   },
   "G": {
     "letter": "G",
-    "state": "0"
+    "state": "0",
+    "row": "1",
+    "order": "4"
   },
   "H": {
     "letter": "H",
-    "state": "0"
+    "state": "0",
+    "row": "1",
+    "order": "5"
   },
   "I": {
     "letter": "I",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "7"
   },
   "J": {
     "letter": "J",
-    "state": "0"
+    "state": "0",
+    "row": "1",
+    "order": "6"
   },
   "K": {
     "letter": "K",
-    "state": "0"
+    "state": "0",
+    "row": "1",
+    "order": "7"
   },
   "L": {
     "letter": "L",
-    "state": "0"
+    "state": "0",
+    "row": "1",
+    "order": "8"
   },
   "M": {
     "letter": "M",
-    "state": "0"
+    "state": "0",
+    "row": "2",
+    "order": "6"
   },
   "N": {
     "letter": "N",
-    "state": "0"
+    "state": "0",
+    "row": "2",
+    "order": "5"
   },
   "O": {
     "letter": "O",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "8"
   },
   "P": {
     "letter": "P",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "9"
   },
   "Q": {
     "letter": "Q",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "0"
   },
   "R": {
     "letter": "R",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "3"
   },
   "S": {
     "letter": "S",
-    "state": "0"
+    "state": "0",
+    "row": "1",
+    "order": "1"
   },
   "T": {
     "letter": "T",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "4"
   },
   "U": {
     "letter": "U",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "6"
   },
   "V": {
     "letter": "V",
-    "state": "0"
+    "state": "0",
+    "row": "2",
+    "order": "3"
   },
   "W": {
     "letter": "W",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "1"
   },
   "X": {
     "letter": "X",
-    "state": "0"
+    "state": "0",
+    "row": "2",
+    "order": "1"
   },
   "Y": {
     "letter": "Y",
-    "state": "0"
+    "state": "0",
+    "row": "0",
+    "order": "5"
   },
   "Z": {
     "letter": "Z",
-    "state": "0"
+    "state": "0",
+    "row": "2",
+    "order": "0"
   }
 }
