@@ -1,26 +1,35 @@
-import Letter from "./Letter";
+import Row from "./Row";
 
 export default function TypedMap(props) {
-  const letters = props.typedMap[0].length;
+  const rows = props.typedMap;
+
+  let midIndex = Math.ceil(rows.length / 2);
+  let firstRowsHalf = rows.slice(0, midIndex);
+  let secondRowsHalf = rows.slice(midIndex);
+
   return (
-    <div
-      className="grid gap-4"
-      style={{
-        gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
-      }}
-    >
-      {props.typedMap &&
-        props.typedMap.map((row, ri) => {
-          return row.map((letter, li) => {
-            return (
-              <Letter
-                letter={letter.typed}
-                status={letter.status}
-                key={ri + "" + li}
-              />
-            );
-          });
-        })}
+    <div className="flex gap-12">
+      {rows && rows.length <= 8 && (
+        <div className="flex flex-col gap-4">
+          {rows.map((row, k) => (
+            <Row key={k} row={row} />
+          ))}
+        </div>
+      )}
+      {rows && rows.length > 8 && (
+        <>
+          <div className="flex flex-col gap-4">
+            {firstRowsHalf.map((row, k) => (
+              <Row key={k} row={row} />
+            ))}
+          </div>
+          <div className="flex flex-col gap-4">
+            {secondRowsHalf.map((row, k) => (
+              <Row key={k} row={row} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
