@@ -27,7 +27,7 @@ export default function Clock(props) {
 
   // Track the timer changes
   useEffect(() => {
-    if (props.haveTimer) setS(cs);
+    if (props.showTimer) setS(cs);
     if (props.haveCountdown) setS(countdownCS - cs);
     if (props.haveCountdown && countdownCS - cs == 0)
       props.setGameStatus("lost");
@@ -35,7 +35,7 @@ export default function Clock(props) {
 
   return (
     <div className="fixed bottom-0 right-0 min-w-48 text-center p-4 flex flex-col items-center justify-start">
-      {(props.haveTimer || props.haveCountdown) && (
+      {(props.showTimer || props.haveCountdown) && (
         <div className="text-4xl w-40">
           <Timer time={s} />
         </div>

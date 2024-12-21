@@ -9,17 +9,18 @@ export default function TypedMap(props) {
         gridTemplateColumns: "repeat(" + letters + ", minmax(0, 1fr))",
       }}
     >
-      {props.typedMap.map((row, ri) => {
-        return row.map((letter, li) => {
-          return (
-            <Letter
-              letter={letter.typed}
-              status={letter.status}
-              key={ri + "" + li}
-            />
-          );
-        });
-      })}
+      {props.typedMap &&
+        props.typedMap.map((row, ri) => {
+          return row.map((letter, li) => {
+            return (
+              <Letter
+                letter={letter.typed}
+                status={letter.status}
+                key={ri + "" + li}
+              />
+            );
+          });
+        })}
     </div>
   );
 }

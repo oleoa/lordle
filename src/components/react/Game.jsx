@@ -21,58 +21,71 @@ import {
 import alphabet from "../../assets/alphabet.json";
 
 export default function Game(props) {
-  const [avaiableWords, setAvaiableWords] = useState([]); // List of all words the player can guess
-  const [answer, setAnswer] = useState(""); // The only correct answer
-
-  const [currentRow, setCurrentRow] = useState(0); // Indicates what row is the player in
-  const [currentLetter, setCurrentLetter] = useState(0); // Indicates what letter is the player typing
-
-  const [lastRecord, setLastRecord] = useState(null); // The last record in time of the current player
-  const [lastWonInCs, setLastWonInCs] = useState(0); // The time it took for player to win the last game
-  const [attempts, setAttempts] = useState(null); // The map of the typed letters used for the records
-
-  const [message, setMessage] = useState(["", ""]); // The message that appears on the bottom of the screen
-
+  const [status, setStatus] = useState("loading"); // ["loading", "ready", "playing", "won", "lost"]
+  const [message, setMessage] = useState(["", ""]); // The message that appears on the bottom of the screen, ["alert", "info", "congrats"]
+  const [words, setWords] = useState({
+    avaiable: [],
+    answer: "",
+  });
+  const [position, setPosition] = useState({
+    row: 0,
+    letter: 0,
+  });
   const [virtualKeyboard, setVirtualKeyboard] = useState(
     getCleanVirtualKeyboard(),
-  ); // The virtual keyboard
-
+  );
   const [typedMap, setTypedMap] = useState(
-    Array(props.rows).fill(
-      Array(props.letters).fill({
+    Array(props.rules.rows).fill(
+      Array(props.rules.letters).fill({
         typed: "", // The letter
         status: "", // ["no", "init", "correct"]
       }),
     ),
   ); // The map of the typed letters
 
+  const [lastRecord, setLastRecord] = useState(null); // The last record in time of the current player
+  const [lastWonInCs, setLastWonInCs] = useState(0); // The time it took for player to win the last game
+  const [attempts, setAttempts] = useState(null); // The map of the typed letters used for the records
+
   const giveUp = () => {
-    props.setGameStatus("lost");
+    setStatus("lost");
   };
   const returnMenu = () => {
-    props.setGameStatus("menu");
+    props.setPage("menu");
   };
   const playAgain = () => {
-    props.setGameStatus("ready");
+    setStatus("loading");
   };
   const backspace = () => {
-    if (currentLetter == 0) return;
-    setTypedMap(setNewTypedMapDeleteKey(typedMap, currentRow, currentLetter));
-    setCurrentLetter((cl) => cl - 1);
+    if (position.letter == 0) return;
+    setTypedMap(
+      setNewTypedMapDeleteKey(typedMap, position.row, position.letter),
+    );
+    setPosition((p) => {
+      return {
+        ...p,
+        letter: p.letter - 1,
+      };
+    });
     return;
   };
   const addLetter = (letter) => {
-    if (currentLetter > props.letters - 1) return;
+    if (position.letter > props.rules.letters - 1) return;
     setTypedMap(
-      setNewTypedMapPressedKey(typedMap, currentRow, currentLetter, letter),
+      setNewTypedMapPressedKey(typedMap, position.row, position.letter, letter),
     );
-    setCurrentLetter((cl) => cl + 1);
+    setPosition((p) => {
+      return {
+        ...p,
+        letter: p.letter + 1,
+      };
+    });
     return;
   };
-  const enterClick = () => {
+  const enter = () => {
     // Get the written word and the answer in array
-    const writtenWordArray = typedMap[currentRow].map((ww) => ww.typed);
-    const answerArray = answer.split("");
+    const writtenWordArray = typedMap[position.row].map((ww) => ww.typed);
+    const answerArray = words.answer.split("");
 
     // If the written word is shorter than the whole length returns
     if (writtenWordArray.filter((wwa) => wwa).length < props.letters) {
@@ -81,7 +94,7 @@ export default function Game(props) {
     }
 
     // Checks if the word is a word
-    if (!avaiableWords.includes(writtenWordArray.join(""))) {
+    if (!words.avaiable.includes(writtenWordArray.join(""))) {
       setMessage(["That is not a word", "alert"]);
       return;
     }
@@ -89,8 +102,8 @@ export default function Game(props) {
     // Creates both the new TypedMap and VirtualKeyboard
     let [newTypedMap, newVirtualKeyboard] =
       setNewTypedMapAndVirtualKeyboardFromWrittenWord(
-        props.letters,
-        currentRow,
+        props.rules.letters,
+        position.row,
         answerArray,
         writtenWordArray,
         typedMap,
@@ -101,99 +114,110 @@ export default function Game(props) {
 
     // Checks if the written word is equal to the chosen one
     if (arraysEqual(writtenWordArray, answerArray)) {
-      props.setGameStatus("won");
+      setStatus("won");
       if (!props.isLoggedIn) setMessage(["Log in to save the records", "info"]);
       else setAttempts(newTypedMap);
     } else {
       // If it is not it checks if the user lost
-      if (currentRow >= props.rows - 1) {
-        props.setGameStatus("lost");
+      if (position.row >= props.rules.rows - 1) {
+        setStatus("lost");
         return;
       }
 
       // If the player didn't lose it passes to the next line
-      setCurrentRow((prevRow) => prevRow + 1);
-      setCurrentLetter(0);
+      setPosition((p) => {
+        return {
+          row: p.row + 1,
+          letter: 0,
+        };
+      });
       return;
     }
   };
 
   const handleClick = (click) => {
-    if (click == "") return;
+    if (click.typed == "") return;
+    if (click.address != "game") return;
+    const authorized = [...alphabet, "Enter", "Backspace", "Escape", "/"];
+    if (!authorized.includes(click.typed)) return;
 
-    const avaiableKeys = [...alphabet];
-    avaiableKeys.push(...["Enter", "Backspace", "Escape", "/"]);
-    if (!avaiableKeys.includes(click)) {
-      props.setClick({ typed: "", observer: 0 });
+    if (status == "loading") return;
+    if (status == "ready" || status == "playing") {
+      if (click.typed == "Enter") enter();
+      if (click.typed == "Escape") returnMenu();
+      if (click.typed == "/") giveUp();
+      if (click.typed == "Backspace") backspace();
+      if (alphabet.includes(click.typed)) addLetter(click.typed);
       return;
     }
-    if (click == "Enter") enterClick();
-    if (click == "Escape") returnMenu();
-    if (click == "/") giveUp();
-    if (click == "Backspace") backspace();
-    if (alphabet.includes(click)) addLetter(click);
-
-    // Deletes the last typed key for safity reasons but don't alert the observer
-    props.setClick((c) => {
-      return { typed: "", observer: c.observer };
-    });
+    if (status == "won" || status == "lost") {
+      if (click.typed == "Enter") playAgain();
+      if (click.typed == "Escape") returnMenu();
+      return;
+    }
   };
-
-  // Tracks the users keyboard while in game
   useEffect(() => {
-    handleClick(props.click.typed);
+    handleClick(props.click);
   }, [props.click.observer]);
 
-  // Tracks if the game has restarted and cleans up the old stats
   useEffect(() => {
-    if (props.gameStatus == "ready") {
-      setCurrentRow(0);
-      setCurrentLetter(0);
-      setAnswer(createNewRandomAnswer(props.letters));
-      setAvaiableWords(createNewAvaiableGuesses(props.letters));
+    if (status == "loading") {
+      setPosition(() => {
+        return {
+          row: 0,
+          letter: 0,
+        };
+      });
+      setWords(() => {
+        return {
+          answer: createNewRandomAnswer(props.rules.letters),
+          avaiable: createNewAvaiableGuesses(props.rules.letters),
+        };
+      });
       setTypedMap(
-        Array(props.rows).fill(
-          Array(props.letters).fill({
+        Array(props.rules.rows).fill(
+          Array(props.rules.letters).fill({
             typed: "", // The letter
             status: "", // ["no", "init", "correct"]
           }),
         ),
       );
       setVirtualKeyboard(getCleanVirtualKeyboard());
+      setStatus("ready");
     }
-  }, [props.gameStatus]);
+  }, [status]);
 
   // Tracks for the user's record
-  useEffect(() => {
-    if (!props.isLoggedIn) return;
-    const asyncFetchUserRecord = async () => {
-      try {
-        const lr = await getLastUserRecord();
-        setLastRecord(lr);
-      } catch (error) {
-        console.error("Failed to fetch the last user record:", error);
-      }
-    };
-    asyncFetchUserRecord();
-    if (lastWonInCs && lastWonInCs < lastRecord) {
-      setMessage(["New Record!", "congrats"]);
-      setLastWonInCs(lastWonInCs);
-      const asyncSetNewRecord = async () => {
-        try {
-          await setNewUserRecord(
-            lastWonInCs,
-            props.rows,
-            props.letters,
-            answer,
-            attempts,
-          );
-        } catch (error) {
-          console.error("Failed to set a new record:", error);
-        }
-      };
-      asyncSetNewRecord();
-    }
-  }, [lastWonInCs]);
+  // useEffect(() => {
+  //   if (!props.isLoggedIn) return;
+  //   const asyncFetchUserRecord = async () => {
+  //     try {
+  //       const lr = await getLastUserRecord();
+  //       setLastRecord(lr);
+  //     } catch (error) {
+  //       console.error("Failed to fetch the last user record:", error);
+  //     }
+  //   };
+  //   asyncFetchUserRecord();
+  //   if (lastWonInCs && lastWonInCs < lastRecord) {
+  //     setMessage(["New Record!", "congrats"]);
+  //     setLastWonInCs(lastWonInCs);
+  //     const asyncSetNewRecord = async () => {
+  //       try {
+  //         await setNewUserRecord(
+  //           lastWonInCs,
+  //           props.rows,
+  //           props.letters,
+  //           answer,
+  //           attempts,
+  //         );
+  //       } catch (error) {
+  //         console.error("Failed to set a new record:", error);
+  //       }
+  //     };
+  //     asyncSetNewRecord();
+  //   }
+  // }, [lastWonInCs]);
 
   return (
     <div className="flex flex-col items-center justify-center gap-12 w-full">
@@ -205,8 +229,8 @@ export default function Game(props) {
           playAgain,
         }}
         lastRecord={lastRecord}
-        gameStatus={props.gameStatus}
-        answer={answer}
+        gameStatus={status}
+        answer={words.answer}
       />
       <TypedMap typedMap={typedMap} />
       <VirtualKeyboard
@@ -214,10 +238,8 @@ export default function Game(props) {
         handleClick={handleClick}
       />
       <Clock
+        rules={props.rules}
         setLastWonInCs={setLastWonInCs}
-        haveTimer={props.haveTimer}
-        haveCountdown={props.haveCountdown}
-        countdown={props.countdown}
         gameStatus={props.gameStatus}
         setGameStatus={props.setGameStatus}
       />
