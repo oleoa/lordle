@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 
 import Minimap from "./Minimap";
+import Secret from "./Secret";
 
 import Toggle from "../../assets/toggle.svg";
 
@@ -70,6 +71,7 @@ export default function Menu(props) {
 
   // Handles the click for the menu
   useEffect(() => {
+    if (props.click.typed == "") return;
     if (props.click.typed == "Enter") startGame();
     else if (props.click.typed == "ArrowRight") moreLetters();
     else if (props.click.typed == "ArrowLeft") lessLetters();
@@ -81,13 +83,14 @@ export default function Menu(props) {
     else if (props.click.typed == "-") lessCountdown();
 
     // Deletes the last typed key for safity reasons but don't alert the observer
-    props.setClick((c) => {
-      return { typed: "", observer: c.observer };
-    });
+    // props.setClick((c) => {
+    //   return { typed: "", observer: c.observer };
+    // });
   }, [props.click.observer]);
 
   return (
     <div className="flex flex-col items-start justify-center gap-4 h-full">
+      <Secret click={props.click} />
       <Minimap
         gameStatus={props.gameStatus}
         letters={props.letters}

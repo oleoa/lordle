@@ -119,6 +119,8 @@ export default function Game(props) {
   };
 
   const handleClick = (click) => {
+    if (click == "") return;
+
     const avaiableKeys = [...alphabet];
     avaiableKeys.push(...["Enter", "Backspace", "Escape", "/"]);
     if (!avaiableKeys.includes(click)) {
