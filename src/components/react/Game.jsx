@@ -86,7 +86,7 @@ export default function Game(props) {
     const answerArray = words.answer.split("");
 
     // If the written word is shorter than the whole length returns
-    if (writtenWordArray.filter((wwa) => wwa).length < props.letters) {
+    if (writtenWordArray.filter((wwa) => wwa).length < props.rules.letters) {
       setMessage(["Not full length", "alert"]);
       return;
     }

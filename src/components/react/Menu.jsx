@@ -143,8 +143,12 @@ export default function Menu(props) {
         rows={props.rules.rows}
       />
       <div className="flex flex-col gap-4 justify-items-center">
+        <h1 className="font-bold underline italic text-center">
+          <a target="_blank" href="https://github.com/oleoa/lordle">
+            Lordle
+          </a>
+        </h1>
         <div className="w-full grid grid-cols-2 gap-4 border-white border-2 rounded-lg p-4 bg-blur">
-          <h3 className="font-bold col-span-2">Menu</h3>
           <div className="flex gap-2">
             <p>Rows</p>
             <button onClick={lessRows}>↑</button>
